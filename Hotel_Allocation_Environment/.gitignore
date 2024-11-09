@@ -1,4 +1,5 @@
 Hotel_Allocation_Environment/
-/Scripts/
+Scripts/
+lib/site-packages/
 __pycache__/
 *.pyc
