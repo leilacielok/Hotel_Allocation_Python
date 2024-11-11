@@ -1,6 +1,8 @@
 Hotel_Allocation_Environment/
 .vscode/
 __pycache__/
+Scripts/
+Lib/
 *.egg-info/
 *.pyc
 *.pyo
