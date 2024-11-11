@@ -1,9 +1,0 @@
-Wordle is played on 11/11/2024 09:12:01.
-The target word is VEVEY.
-Attempt 1: MEDAL.
-Attempt 2: TENET.
-Attempt 3: RESET.
-Attempt 4: LEREN.
-Attempt 5: PETER.
-Attempt 6: WEREN.
-
