@@ -15,10 +15,10 @@ guests_dict = {}
 for i, row in guests_df.iterrows():
     guest_id = row['guest']
     discount = row['discount']
-    # Store the preferences in the 'guests' dictionary
+    guests_dict[guest_id] = guests(guest_id, discount)  # Store the preferences in the 'guests' dictionary
 
-# Print guest_dict to check its contents
+# Check
 for guest_id, guest_obj in guests_dict.items():
     print(f"Guest ID: {guest_id}")
     print(f"Discount: {guest_obj.discount}")
-    print()  # Print a newline for readability
+    print()
