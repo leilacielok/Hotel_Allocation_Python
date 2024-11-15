@@ -41,11 +41,8 @@ def random_allocation(guests_dict, hotels_dict):
 
     return allocation
 
-    
-
 # I have the result, now I just need something to check the result:
 # whether every guest was assigned how many hotels remain, how many rooms for each hotel, total revenue of each hotel.
-
 
 # Call the random_allocation function
 random_allocation_result = random_allocation(guests_dict, hotels_dict)
@@ -82,4 +79,8 @@ print("\nHotel Status:")
 for hotel_id, status in hotel_status.items():
     print(f"{hotel_id}: Remaining Rooms: {status['remaining_rooms']}, Total Revenue: ${status['revenue']:.2f}")
 
-
+# ADDITION: HOW MANY GUESTS FOR EACH HOTEL
+# Count the number of guests per hotel from the allocation result
+#hotel_guest_counts = {hotel_id: 0 for hotel_id in hotels_dict.keys()}
+#for guest_id, details in random_allocation_result.items():
+ #   hotel_guest_counts[details['hotel_id']] += 1
