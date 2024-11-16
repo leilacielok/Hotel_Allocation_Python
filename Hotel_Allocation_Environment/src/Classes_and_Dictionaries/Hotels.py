@@ -17,10 +17,3 @@ for i, row in hotels_df.iterrows():
 if __name__ == "__main__":    
     print(hotels_dict)
 
-# CHECK THIS: Print guest_dict to check its contents
-#if __name__ == "__main__":    
-    #for hotel_id, hotel_data in hotels_dict.items():
-     #   print(f"Hotel ID: {hotel_id}")
-      #  print(f"Number of rooms available: {hotel_id: hotel_data['available_rooms']}")
-       # print(f"Price of the room: {hotel_id: hotel_data['price']}")
-        #print()  # Print a newline for readability
