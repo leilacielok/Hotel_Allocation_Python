@@ -3,6 +3,7 @@ Hotel_Allocation_Environment/
 __pycache__/
 Scripts/
 Lib/
+Data/
 *.egg-info/
 *.pyc
 *.pyo
