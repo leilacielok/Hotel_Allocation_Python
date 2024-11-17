@@ -49,14 +49,14 @@ def random_allocation(guests_dict, hotels_dict):
 random_allocation_result = random_allocation(guests_dict, hotels_dict)
 
 # Check if all guests have been assigned: Set operations
-def random_check_all_guests_assigned(guests_dict, random_allocation_result):
+def random_check_unassigned_guests(guests_dict, random_allocation_result):
     unassigned_guests = set(guests_dict.keys()) - set(random_allocation_result.keys()) #By converting to sets, I can use subtraction to identify unassigned guests
     if unassigned_guests:
         print("Unassigned guests:", list(unassigned_guests))
     else:
         print("All guests have been successfully assigned.")
 
-random_check_assignment = random_check_all_guests_assigned(guests_dict, random_allocation_result)
+random_check_assignment = random_check_unassigned_guests(guests_dict, random_allocation_result)
 
 # Initialize rooms occupied, guests accommodated, revenues and remaining rooms (dictionary)
 hotel_status = {
