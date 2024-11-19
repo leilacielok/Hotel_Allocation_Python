@@ -17,6 +17,7 @@ def price_allocation(guests_dict, hotels_dict):
     allocation = {}
     hotel_occupancy = {hotel_id: {'occupied_rooms': 0, 'guests': []} for hotel_id in hotels_dict}
     guest_revenues = {} # revenue per guest
+    guest_satisfaction = {}  # satisfaction score for each guest
     
     # Step 2: Process guests in ID order
     for guest_id, guest_info in sorted(guests_dict.items()): # sort guests by their ids: reservation order
@@ -39,12 +40,15 @@ def price_allocation(guests_dict, hotels_dict):
                     discounted_price = hotels_dict[hotel_id]['price'] * (1 - discount)
                     guest_revenues[guest_id] = discounted_price # store revenue per guest
                     
+                    # Satisfaction score
+                    guest_satisfaction[guest_id] = round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)  # Higher score for better match
+
                     allocated = True
                     break  # Stop and move to the next guest once allocated
         
         if not allocated:
-            print(f"No allocation for {guest_id}")
-    
+            guest_satisfaction[guest_id] = 0  # No allocation = 0 satisfaction
+
     # Stats for unassigned guests
     unassigned_count = len([guest_id for guest_id in guests_dict if guest_id not in allocation]) #count how many guests were not assigned
     unassigned_guests = [guest_id for guest_id in guests_dict if guest_id not in allocation] # list to order the ids of unassigned guests (one can see them also from the print)
@@ -71,6 +75,10 @@ def price_allocation(guests_dict, hotels_dict):
     occupied_hotels_count = sum(1 for details in price_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0 # don't divide by 0
     
+    # Satisfaction score
+    total_satisfaction_score = sum(guest_satisfaction.values())
+    average_satisfaction_score = round(total_satisfaction_score / len(guests_dict), 2) # I include unassigned guest to penalize the final score
+
     # return the results for allocation, guests and hotels.
     return{
         'allocation': allocation,
@@ -79,16 +87,26 @@ def price_allocation(guests_dict, hotels_dict):
         'occupied_hotels_count': occupied_hotels_count,
         'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
         'price_allocation_report': price_allocation_report,
-        'average_revenue': average_revenue
+        'average_revenue': average_revenue,
+        'guest_satisfaction': guest_satisfaction,
+        'average_satisfaction_score': average_satisfaction_score
     }    
     
 price_allocation_result = price_allocation(guests_dict, hotels_dict)
 
-def printed_price_allocation_report(price_allocation_report):   
+def printed_price_allocation_report(price_allocation_result):   
     print("\nPrice Allocation Report:")
     for hotel_id, report in price_allocation_result['price_allocation_report'].items():
         print(f"\n{hotel_id}:")
         for key, value in report.items():
             print(f"  {key.replace('_', ' ').capitalize()}: {value}")
 
+    print("\nGuest Satisfaction:")
+    for guest_id, score in price_allocation_result['guest_satisfaction'].items():
+        print(f"  Guest {guest_id}: Satisfaction Score = {score}")
+    
+    print(f"\nAverage Satisfaction Score: {price_allocation_result['average_satisfaction_score']}")
 # printed_price_allocation_report(price_allocation_result['price_allocation_report'])
+
+printed_price_allocation_report(price_allocation_result)
+print(printed_price_allocation_report)
