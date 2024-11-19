@@ -3,113 +3,135 @@ import random
 from src.Classes_and_Dictionaries.Guests import guests_dict
 from src.Classes_and_Dictionaries.Hotels import hotels_dict
 
-guest_ids = np.array(list(guests_dict.keys()))
 
-# Function for random allocation of customers to hotels
 def random_allocation(guests_dict, hotels_dict):
-    # List of available hotel-room pairs (hotel ID, room number)
-    left_rooms = []
-    for hotel_id, hotel_data in hotels_dict.items():
-        left_rooms.extend([(hotel_id, room_num + 1) for room_num in range(hotel_data['available_rooms'])])  #list of tuples: hotel id + rooms
-
-    # Numpy to shuffle guest list to ensure random assignment order
-    np.random.shuffle(guest_ids)
     
-    # Dictionary to store allocation details
-    allocation = {}
-
-    # Allocate each guest to a room as long as there are available rooms
+    # 1: shuffle the list of guest IDs for randoma allocation (Numpy)
+    # 2: Dictionary to store allocation and satisfaction details
+    guest_ids = list(guests_dict.keys())
+    np.random.shuffle(guest_ids)
+    allocation = {}    
+    guest_satisfaction = {}
+    
+    # 3: Allocate each guest to a room as long as there are available rooms
     for guest_id in guest_ids:
-        if not left_rooms:
+        guest_id_str = str(guest_id) # ensure it is a string
+        available_hotels = [hotel_id for hotel_id, hotel_data in hotels_dict.items()
+                            if hotel_data['available_rooms'] > 0] # get the list of hotels with available rooms
+        if not available_hotels:
             print("No more rooms available.")
-            break
-        # Select a random room from the left rooms list    
-        hotel_id, room_number = left_rooms.pop(random.randint(0, len(left_rooms) - 1))   #generates a random integer between 0 and the last valid index in the list (len(new_room_number) - 1).
-       
-        # Fetch the guest's discount and hotel's room price
-        guest_discount = guests_dict[guest_id]['discount'] # discount of the guest
-        room_price = hotels_dict[hotel_id]['price'] # room price
-        # Final price of the room (discounted)
-        final_price = room_price * (1 - guest_discount)
+            break 
+    
+        hotel_id = random.choice(available_hotels) # Select a random hotel from the available hotels list 
+        guest_discount = guests_dict[guest_id]['discount'] # Get the guest's discount and hotel's final room price
+        room_price = hotels_dict[hotel_id]['price']
+        revenue = round(room_price * (1 - guest_discount), 2)
+        preferences = guests_dict[guest_id]['preferences']  # Guest's list of preferred hotels
+        
+        # Satisfaction score
+        satisfaction_score = (
+            round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)
+            if hotel_id in preferences else 0 # default score for hotels outside the preference list
+        ) 
+        
+        hotels_dict[hotel_id]['available_rooms'] -= 1 # update the number of available rooms in the hotel allocated
         
         # Store the allocation
-        allocation[guest_id] = {
-                'hotel_id': hotel_id,
-                'room_number': room_number,
+        if hotel_id not in allocation: # 'new' hotel in the allocation dictionary
+            allocation[hotel_id] = {
+                'occupied_rooms': 1, # one room occupied at the first allocation
+                'available_rooms': hotels_dict[hotel_id]['available_rooms'],
                 'discount_applied': guest_discount,
-                'price_paid': final_price
+                'revenue': revenue,
+                'number_of_guests_accommodated': 1,
+                'guests': [guest_id_str],
             }
 
-    return allocation
+        else: # If the hotel is already in allocation
+            allocation[hotel_id]['occupied_rooms'] += 1  # Increment the number of occupied rooms
+            allocation[hotel_id]['available_rooms'] = hotels_dict[hotel_id]['available_rooms']
+            allocation[hotel_id]['revenue'] += revenue # add to the total revenue    
+            allocation[hotel_id]['number_of_guests_accommodated'] += 1            
+            allocation[hotel_id]['guests'].append(guest_id_str)  # Add the guest to the guest list
+    
+        # track satisfaction for the guest
+        guest_satisfaction[guest_id_str] = satisfaction_score
 
-# I have the result, now I just need something to check the result:
-# whether every guest was assigned how many hotels remain, how many rooms for each hotel, total revenue of each hotel.
+    # Hotel status
+    random_allocation_report = {}
+    for hotel_id, data in hotels_dict.items():
+        if hotel_id in allocation:
+            details = allocation[hotel_id]
+            random_allocation_report[hotel_id] = {
+                'occupied_rooms': details['occupied_rooms'],
+                'available_rooms': details['available_rooms'],
+                'discount_applied': details['discount_applied'],
+                'revenue': details['revenue'],  
+                'number_of_guests_accommodated': details['number_of_guests_accommodated'],
+                'guests': details['guests'],
+            }
+    else:
+        # Initialize with default values for hotels with no allocation
+        random_allocation_report[hotel_id] = {
+            'occupied_rooms': 0,
+            'available_rooms': data['available_rooms'],
+            'discount_applied': None,
+            'revenue': 0,  # Default revenue
+            'number_of_guests_accommodated': 0,
+            'guests': [],
+        }
+    
+    # Overall statistics 
+    total_guests = len(guest_satisfaction)
+    total_revenues = sum(details['revenue'] for details in allocation.values()) # default value of 0 if revenue missing (no guests assigned to a hotel)
+    occupied_hotels_count = sum(1 for details in allocation.values() if details['number_of_guests_accommodated'] > 0)
+    average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0
+    total_satisfaction_score = sum(guest_satisfaction.values())
+    average_satisfaction_score = round(total_satisfaction_score / total_guests, 2) if total_guests > 0 else 0
+        
+    #allocation['average_satisfaction'] = average_satisfaction_score # add the value to the allocation
+    
+    return {
+        'allocation': allocation,
+        'random_allocation_report': random_allocation_report,
+        'occupied_hotels_count': occupied_hotels_count,
+        'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
+        'average_revenue': average_revenue,
+        'guest_satisfaction': guest_satisfaction,
+        'average_satisfaction_score': average_satisfaction_score,
+        'total_guests_count': total_guests
+    }    
+
 
 # Call the random_allocation function
 random_allocation_result = random_allocation(guests_dict, hotels_dict)
 
-# Check if all guests have been assigned: Set operations
-def random_check_unassigned_guests(guests_dict, random_allocation_result):
-    unassigned_guests = set(guests_dict.keys()) - set(random_allocation_result.keys()) #By converting to sets, I can use subtraction to identify unassigned guests
-    if unassigned_guests:
-        print("Unassigned guests:", list(unassigned_guests))
-    else:
-        print("All guests have been successfully assigned.")
-
-random_check_assignment = random_check_unassigned_guests(guests_dict, random_allocation_result)
-
-# Initialize rooms occupied, guests accommodated, revenues and remaining rooms (dictionary)
-hotel_status = {
-    hotel_id: {
-        'rooms_occupied': 0,
-        'guests_accommodated': 0,
-        'revenue': 0,
-        'remaining_rooms': hotels_dict[hotel_id]['available_rooms'] 
-        }
-    for hotel_id in hotels_dict.keys()}
-
-# Extract data to use Numpy
-room_prices = np.array([hotels_dict[info['hotel_id']]['price'] for guest_id, info in random_allocation_result.items()])
-discounts = np.array([info['discount_applied'] for guest_id, info in random_allocation_result.items()])
-allocated_hotels = np.array([info['hotel_id'] for guest_id, info in random_allocation_result.items()])
-
-# Vectorized calculation of final prices
-final_prices = room_prices * (1 - discounts)
-
-# Initialize customer satisfaction
-total_satisfaction = 0
-
-# Update hotel status
-for guest_id, (final_price, allocated_hotel) in enumerate(zip(final_prices, allocated_hotels)):
-    hotel_status[allocated_hotel]['rooms_occupied'] += 1 # Add one occupied room for each allocation
-    hotel_status[allocated_hotel]['guests_accommodated'] += 1 # Add 1 guest for each allocation
-    hotel_status[allocated_hotel]['revenue'] += final_price # add price discounted as revenue
-    hotel_status[allocated_hotel]['remaining_rooms'] -= 1 # Subtract one available room for each allocation
-
-    # Guest satisfaction: if the hotel is in the preference, calculate the score, otherwise score = 0
-    preferences = guests_dict[guest_ids[guest_id]]['preferences']
-    if allocated_hotel in preferences:
-        satisfaction_score = ((len(preferences)) - preferences.index(allocated_hotel)) / len(preferences) * 100
-    else:
-        satisfaction_score = 0
-    total_satisfaction += satisfaction_score
-
-# Average satisfaction: aggregate the scores and calculate average
-average_satisfaction = total_satisfaction / len(guest_ids) if len(guest_ids) > 0 else 0
-
-# How many hotels were occupied? (At least one room occupied)
-total_occupied_hotels = sum(1 for status in hotel_status.values() if status['rooms_occupied'] > 0)
-
-
-# Print updated status
-print("\nHotel Status:")
-for hotel_id, status in hotel_status.items():
-    print(
-        f"{hotel_id}: Remaining Rooms = {status['remaining_rooms']}, "
-        f"Rooms Occupied = {status['rooms_occupied']}, "
-        f"Revenue = ${status['revenue']:.2f}, "
-        f"Guests Accommodated = {status['guests_accommodated']}"
-    )
-
-print(f"\nTotal Hotels Occupied: {total_occupied_hotels}")
-print(f"Average Customer Satisfaction: {average_satisfaction:.2f}%")
+# Function to print the report
+def print_random_allocation_report(random_allocation_result):
+    # Access random_allocation_report from the random_allocation_result dictionary
+    if 'random_allocation_report' in random_allocation_result:
+        print("Hotel Allocation Report:")
+        for hotel, details in random_allocation_result['random_allocation_report'].items():
+            print(f"'{hotel}': {{")
+            print(f"    'occupied_rooms': {details['occupied_rooms']},")
+            print(f"    'available_rooms': {details['available_rooms']},")
+            print(f"    'number_of_guests_accommodated': {details['number_of_guests_accommodated']},")
+            print(f"    'final_revenue': {details['revenue']:.2f},")
+            print(f"    'guests': {details['guests']}")
+            print("}")
+        
+        # Overall statistics
+        print("\nOverall Statistics:")
+        print(f"Total number of guests assigned: {random_allocation_result['total_guests_count']}")
+        print(f"Overall average degree of satisfaction: {random_allocation_result['average_satisfaction_score']:.2f}")
+        print(f"Total number of hotels occupied: {random_allocation_result['occupied_hotels_count']}")
+        print(f"Overall average revenue per hotel: {random_allocation_result['average_revenue']:.2f}")
+        
+        # Guest satisfaction scores
+     #   print("\nGuest Satisfaction Scores:")
+     #   for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
+     #       print(f"    '{guest_id}': {satisfaction:.2f}")
+   
+        
+# Call the function to print the report
+print_random_allocation_report(random_allocation_result)
