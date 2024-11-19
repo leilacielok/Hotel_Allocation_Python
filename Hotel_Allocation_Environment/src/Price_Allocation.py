@@ -16,10 +16,12 @@ def price_allocation(guests_dict, hotels_dict):
     # Store statistics
     allocation = {}
     hotel_occupancy = {hotel_id: {'occupied_rooms': 0, 'guests': []} for hotel_id in hotels_dict}
+    guest_revenues = {} # revenue per guest
     
     # Step 2: Process guests in ID order
     for guest_id, guest_info in sorted(guests_dict.items()): # sort guests by their ids: reservation order
         preferences = guest_info['preferences'] # retrieve the preferences for each guest
+        discount = guest_info.get('discount', 0) # retrieve discount rate for each guest
         allocated = False
         
         for hotel_id in sorted_hotels:
@@ -32,49 +34,61 @@ def price_allocation(guests_dict, hotels_dict):
                     hotels_dict[hotel_id]['available_rooms'] -= 1
                     hotel_occupancy[hotel_id]['occupied_rooms'] += 1
                     hotel_occupancy[hotel_id]['guests'].append(guest_id) # Track which guests were allocated to this hotel
+                    
+                    # Revenue of the hotel for this guest
+                    discounted_price = hotels_dict[hotel_id]['price'] * (1 - discount)
+                    guest_revenues[guest_id] = discounted_price # store revenue per guest
+                    
                     allocated = True
                     break  # Stop and move to the next guest once allocated
         
         if not allocated:
             print(f"No allocation for {guest_id}")
     
+    # Stats for unassigned guests
     unassigned_count = len([guest_id for guest_id in guests_dict if guest_id not in allocation]) #count how many guests were not assigned
-    occupied_hotels_count = sum(1 for hotel_id in hotel_occupancy if hotel_occupancy[hotel_id]['occupied_rooms'] > 0)
+    unassigned_guests = [guest_id for guest_id in guests_dict if guest_id not in allocation] # list to order the ids of unassigned guests (one can see them also from the print)
 
-    # Results
-    unassigned_guests = [guest_id for guest_id in guests_dict if guest_id not in allocation]
-    remaining_rooms = {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict}
-    occupied_rooms_per_hotel = {hotel_id: hotel_occupancy[hotel_id]['occupied_rooms'] for hotel_id in hotels_dict}
-    guests_per_hotel = {hotel_id: hotel_occupancy[hotel_id]['guests'] for hotel_id in hotels_dict}
+    # Hotel report
+    price_allocation_report = {}
+
+    for hotel_id, data in hotels_dict.items():
+        occupied_rooms = hotel_occupancy[hotel_id]['occupied_rooms']
+        guests = hotel_occupancy[hotel_id]['guests']
+        final_revenue = sum(guest_revenues[guest_id] for guest_id in guests)
+        
+        price_allocation_report[hotel_id] = {
+            'rooms_occupied': occupied_rooms,
+            'rooms_available': data['available_rooms'],
+            'number_of_guests_accommodated': len(guests),
+            'final_revenue': round(final_revenue, 2),
+            'guests': guests
+        } 
     
-    # Return all the results
-    return {
+    # Now I have all the details I need to compute total and average revenue
+    # Total and overall average revenue
+    total_revenues = sum(details['final_revenue'] for details in price_allocation_report.values())
+    occupied_hotels_count = sum(1 for details in price_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
+    average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0 # don't divide by 0
+    
+    # return the results for allocation, guests and hotels.
+    return{
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
         'unassigned_count': unassigned_count,
         'occupied_hotels_count': occupied_hotels_count,
-        'remaining_rooms': remaining_rooms,
-        'occupied_rooms_per_hotel': occupied_rooms_per_hotel,
-        'guests_per_hotel': guests_per_hotel
-    }
-
-price_allocation_result = price_allocation(guests_dict, hotels_dict)
-print("\nAllocation Results:")
-print(price_allocation_result['allocation'])
-
-print(f"\nNumber of unassigned guests: {price_allocation_result['unassigned_count']}")
-print(f"Unassigned guests: {price_allocation_result['unassigned_guests']}")
-
-print(f"\nNumber of occupied hotels: {price_allocation_result['occupied_hotels_count']}")
-
-print("\nRemaining rooms in each hotel:")
-for hotel, remaining in price_allocation_result['remaining_rooms'].items():
-    print(f"{hotel}: {remaining} rooms left")
-
-print("\nOccupied rooms in each hotel:")
-for hotel, occupied in price_allocation_result['occupied_rooms_per_hotel'].items():
-    print(f"{hotel}: {occupied} rooms occupied")
+        'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
+        'price_allocation_report': price_allocation_report,
+        'average_revenue': average_revenue
+    }    
     
-print("\nGuests in each hotel:")
-for hotel, guests in price_allocation_result['guests_in_each_hotel'].items():
-    print(f"{hotel}: {len(guests)} guests assigned")
+price_allocation_result = price_allocation(guests_dict, hotels_dict)
+
+def printed_price_allocation_report(price_allocation_report):   
+    print("\nPrice Allocation Report:")
+    for hotel_id, report in price_allocation_result['price_allocation_report'].items():
+        print(f"\n{hotel_id}:")
+        for key, value in report.items():
+            print(f"  {key.replace('_', ' ').capitalize()}: {value}")
+
+# printed_price_allocation_report(price_allocation_result['price_allocation_report'])
