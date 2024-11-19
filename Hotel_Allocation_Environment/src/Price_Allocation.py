@@ -94,19 +94,36 @@ def price_allocation(guests_dict, hotels_dict):
     
 price_allocation_result = price_allocation(guests_dict, hotels_dict)
 
-def printed_price_allocation_report(price_allocation_result):   
-    print("\nPrice Allocation Report:")
+#def printed_price_allocation_report(price_allocation_result):   
+    
+ #   print("\nPrice Allocation Report:")
+  #  for hotel_id, report in price_allocation_result['price_allocation_report'].items():
+   #     print(f"\n{hotel_id}:")
+    #    for key, value in report.items():
+     #       print(f"  {key.replace('_', ' ').capitalize()}: {value}")
+
+
+def printed_price_allocation_report(price_allocation_result):
+    # Print Unassigned Guests 
+    print("\nUnassigned Guests:")
+    print(f"  {price_allocation_result['unassigned_count']} guests were not assigned to any hotel.")
+    print(f"  Unassigned Guests List: {price_allocation_result['unassigned_guests']}")
+    
+    # Print total occupied hotels
+    print(f"\nNumber of Occupied Hotels: {price_allocation_result['occupied_hotels_count']}")
+
+    # Print details for each hotel: Remaining Rooms, Occupied Rooms, and Revenue
+    print("\nHotel Room Allocation and Revenue:")
     for hotel_id, report in price_allocation_result['price_allocation_report'].items():
         print(f"\n{hotel_id}:")
-        for key, value in report.items():
-            print(f"  {key.replace('_', ' ').capitalize()}: {value}")
+        print(f"  Remaining Rooms: {report['rooms_available']}")
+        print(f"  Occupied Rooms: {report['rooms_occupied']}")
+        print(f"  Revenue: {report['final_revenue']}")
+        print(f"  Assigned Guests: {report['guests']}")  # Printing the list of assigned guests
 
-    print("\nGuest Satisfaction:")
-    for guest_id, score in price_allocation_result['guest_satisfaction'].items():
-        print(f"  Guest {guest_id}: Satisfaction Score = {score}")
-    
-    print(f"\nAverage Satisfaction Score: {price_allocation_result['average_satisfaction_score']}")
-# printed_price_allocation_report(price_allocation_result['price_allocation_report'])
+    # Print the overall average revenue and average satisfaction score
+    print(f"\nOverall Average Revenue: {price_allocation_result['average_revenue']}")
+    print(f"Average Satisfaction Score: {price_allocation_result['average_satisfaction_score']}")
 
 printed_price_allocation_report(price_allocation_result)
 print(printed_price_allocation_report)
