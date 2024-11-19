@@ -94,15 +94,6 @@ def price_allocation(guests_dict, hotels_dict):
     
 price_allocation_result = price_allocation(guests_dict, hotels_dict)
 
-#def printed_price_allocation_report(price_allocation_result):   
-    
- #   print("\nPrice Allocation Report:")
-  #  for hotel_id, report in price_allocation_result['price_allocation_report'].items():
-   #     print(f"\n{hotel_id}:")
-    #    for key, value in report.items():
-     #       print(f"  {key.replace('_', ' ').capitalize()}: {value}")
-
-
 def printed_price_allocation_report(price_allocation_result):
     # Print Unassigned Guests 
     print("\nUnassigned Guests:")
