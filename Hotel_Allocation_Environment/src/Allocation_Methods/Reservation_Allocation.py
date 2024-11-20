@@ -1,8 +1,13 @@
 import numpy as np
-from src.Classes_and_Dictionaries.Guests import guests_dict
-from src.Classes_and_Dictionaries.Hotels import hotels_dict
+from src.Classes_and_Dictionaries.Guests import guests_dict_original
+from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
 
-def reservation_allocation(guests_dict, hotels_dict):
+def reservation_allocation(guests_dict_original, hotels_dict_original):
+    
+    # Make copies of the dictionaries to prevent modifying the originals
+    guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
+    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
+    
     allocation = {} # store the allocation
 
     hotel_status = { # initialize Hotel status
@@ -96,7 +101,7 @@ def reservation_allocation(guests_dict, hotels_dict):
         'average_satisfaction_score': average_satisfaction_score
     } 
 
-reservation_allocation_result = reservation_allocation(guests_dict, hotels_dict)
+reservation_allocation_result = reservation_allocation(guests_dict_original, hotels_dict_original)
 
 
 def printed_reservation_allocation_report(reservation_allocation_result):

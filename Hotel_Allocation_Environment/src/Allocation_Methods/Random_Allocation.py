@@ -1,10 +1,14 @@
 import numpy as np
 import random
-from src.Classes_and_Dictionaries.Guests import guests_dict
-from src.Classes_and_Dictionaries.Hotels import hotels_dict
+from src.Classes_and_Dictionaries.Guests import guests_dict_original
+from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
 
 
-def random_allocation(guests_dict, hotels_dict):
+def random_allocation(guests_dict_original, hotels_dict_original, verbose = False):
+    
+    # Make copies of the dictionaries to prevent modifying the originals
+    guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
+    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
     
     # 1: shuffle the list of guest IDs for randoma allocation (Numpy)
     # 2: Dictionary to store allocation and satisfaction details
@@ -19,7 +23,8 @@ def random_allocation(guests_dict, hotels_dict):
         available_hotels = [hotel_id for hotel_id, hotel_data in hotels_dict.items()
                             if hotel_data['available_rooms'] > 0] # get the list of hotels with available rooms
         if not available_hotels:
-            print("No more rooms available.")
+            if verbose:
+                print("No more rooms available.")
             break 
     
         hotel_id = random.choice(available_hotels) # Select a random hotel from the available hotels list 
@@ -103,7 +108,7 @@ def random_allocation(guests_dict, hotels_dict):
     }    
 
 # Call the random_allocation function
-random_allocation_result = random_allocation(guests_dict, hotels_dict)
+random_allocation_result = random_allocation(guests_dict_original, hotels_dict_original)
 
 
 # Function to print the report

@@ -4,10 +4,14 @@
 # Once a room is allocated I can move to the next guest.
 
 import pandas as pd
-from src.Classes_and_Dictionaries.Guests import guests_dict
-from src.Classes_and_Dictionaries.Hotels import hotels_dict
+from src.Classes_and_Dictionaries.Guests import guests_dict_original
+from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
 
-def price_allocation(guests_dict, hotels_dict):
+def price_allocation(guests_dict_original, hotels_dict_original):
+    
+    # Make copies of the dictionaries to prevent modifying the originals
+    guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
+    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
     
     # 1: sort hotels by price using pandas
     hotels_df = pd.DataFrame(hotels_dict).T  # Transpose to flip the dictionary
@@ -105,7 +109,7 @@ def price_allocation(guests_dict, hotels_dict):
         'average_satisfaction_score': average_satisfaction_score
     }    
     
-price_allocation_result = price_allocation(guests_dict, hotels_dict)
+price_allocation_result = price_allocation(guests_dict_original, hotels_dict_original)
 
 def printed_price_allocation_report(price_allocation_result):
     # Print Unassigned Guests 
