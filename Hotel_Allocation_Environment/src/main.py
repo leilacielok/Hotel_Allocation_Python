@@ -7,6 +7,7 @@ from copy import deepcopy
 from src.Allocation_Methods.Reservation_Allocation import reservation_allocation, printed_reservation_allocation_report
 from src.Allocation_Methods.Price_Allocation import price_allocation, printed_price_allocation_report
 from src.Allocation_Methods.Random_Allocation import random_allocation, print_random_allocation_report
+from src.Allocation_Methods.Availability_Allocation import availability_allocation, printed_availability_allocation_report
 from src.Classes_and_Dictionaries.Guests import guests_dict_original
 from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
 
@@ -18,6 +19,7 @@ class HotelManager:
         self.price_allocation_result = None  # To store price allocation result
         self.reservation_allocation_result = None  # To store reservation allocation result
         self.random_allocation_result = None  # To store random allocation result
+        self.availability_allocation_result = None # To store availability allocation result
         
     def reset_hotels(self):
         self.hotels_dict = deepcopy(hotels_dict_original)
@@ -36,6 +38,11 @@ class HotelManager:
         self.price_allocation_result = price_allocation(self.guests_dict, self.hotels_dict)
         price_allocation_report = printed_price_allocation_report(self.price_allocation_result)
         return price_allocation_report
+    
+    def run_availability_allocation(self):
+        self.availability_allocation_result = availability_allocation(self.guests_dict, self.hotels_dict)
+        availability_allocation_report = printed_availability_allocation_report(self.availability_allocation_result)
+        return availability_allocation_report
     
     
     
@@ -59,6 +66,10 @@ if __name__ == "__main__":
     random_result = manager.run_random_allocation()
     print(random_result)
     
+    print("\nRunning Availability Allocation...")
+    manager.reset_hotels()
+    availability_result = manager.run_availability_allocation()
+    print(availability_result)
 
 
 
