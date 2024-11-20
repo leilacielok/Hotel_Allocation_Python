@@ -19,3 +19,4 @@ for i, row in guests_df.iterrows():  # iterate over each row in the dataframe
    
     guests_dict[guest_id] = create_guest(guest_id, discount, hotels_priority)
 
+print(guests_dict)
