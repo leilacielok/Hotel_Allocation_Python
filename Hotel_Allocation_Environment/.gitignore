@@ -4,6 +4,7 @@ __pycache__/
 Scripts/
 Lib/
 Data_storing/
+share/man/man1/
 *.egg-info/
 *.pyc
 *.pyo
