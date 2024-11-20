@@ -115,6 +115,11 @@ random_allocation_result = random_allocation(guests_dict_original, hotels_dict_o
 def print_random_allocation_report(random_allocation_result):
     # Access random_allocation_report from the random_allocation_result dictionary
     if 'random_allocation_report' in random_allocation_result:
+        # Guest satisfaction scores
+        print("\nGuest Satisfaction Scores:")
+        for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
+            print(f"    '{guest_id}': {satisfaction:.2f}")
+            
         print("Hotel Allocation Report:")
         for hotel, details in random_allocation_result['random_allocation_report'].items():
             print(f"'{hotel}': {{")
@@ -132,10 +137,6 @@ def print_random_allocation_report(random_allocation_result):
         print(f"Total number of hotels occupied: {random_allocation_result['occupied_hotels_count']}")
         print(f"Overall average revenue per hotel: {random_allocation_result['average_revenue']:.2f}")
         
-        # Guest satisfaction scores
-        print("\nGuest Satisfaction Scores:")
-        for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
-            print(f"    '{guest_id}': {satisfaction:.2f}")
      
 # Call the function to print the report
 print_random_allocation_report(random_allocation_result)

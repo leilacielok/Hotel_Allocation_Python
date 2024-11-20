@@ -86,6 +86,8 @@ def price_allocation(guests_dict_original, hotels_dict_original):
             'guests': guests
         } 
     
+    total_assigned_guests = len(allocation)  # Number of guests assigned to hotels
+
     # Now I have all the details I need to compute total and average revenue
     # Total and overall average revenue
     total_revenues = sum(details['final_revenue'] for details in price_allocation_report.values())
@@ -101,6 +103,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
         'unassigned_count': unassigned_count,
+        'assigned_guests_count': total_assigned_guests,
         'occupied_hotels_count': occupied_hotels_count,
         'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
         'price_allocation_report': price_allocation_report,
@@ -117,8 +120,10 @@ def printed_price_allocation_report(price_allocation_result):
     print(f"  {price_allocation_result['unassigned_count']} guests were not assigned to any hotel.")
     print(f"  Unassigned Guests List: {price_allocation_result['unassigned_guests']}")
     
-    # Print total occupied hotels
-    print(f"\nNumber of Occupied Hotels: {price_allocation_result['occupied_hotels_count']}")
+    # Print guests' satisfaction scores
+    print("\nCustomer Satisfaction Scores:")
+    for guest_id, satisfaction_score in price_allocation_result['guest_satisfaction'].items():
+        print(f"  Guest {guest_id}: Satisfaction Score = {satisfaction_score}")
 
     # Print details for each hotel: Remaining Rooms, Occupied Rooms, and Revenue
     print("\nHotel Room Allocation and Revenue:")
@@ -129,9 +134,12 @@ def printed_price_allocation_report(price_allocation_result):
         print(f"  Revenue: {report['final_revenue']}")
         print(f"  Assigned Guests: {report['guests']}")  # Printing the list of assigned guests
 
-    # Print the overall average revenue and average satisfaction score
-    print(f"\nOverall Average Revenue: {price_allocation_result['average_revenue']}")
-    print(f"Average Satisfaction Score: {price_allocation_result['average_satisfaction_score']}")
+    # Print the overall statistics
+    print("\nOverall Statistics:")
+    print(f"Total number of guests assigned: {price_allocation_result['assigned_guests_count']}")
+    print(f"Overall average degree of satisfaction: {price_allocation_result['average_satisfaction_score']}")
+    print(f"Total number of hotels occupied: {price_allocation_result['occupied_hotels_count']}")
+    print(f"Overall average revenue per hotel: {price_allocation_result['average_revenue']:.2f}")
 
 printed_price_allocation_report(price_allocation_result)
 

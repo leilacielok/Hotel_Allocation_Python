@@ -79,6 +79,9 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
             'guests': guests
         } 
     
+    # Calculate total number of guests assigned
+    total_assigned_guests = len(allocation)  # Number of guests assigned to hotels
+    
     # Now I have all the details I need to compute total and average revenue
     # Total and overall average revenue
     total_revenues = sum(details['final_revenue'] for details in reservation_allocation_report.values())
@@ -93,6 +96,7 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
         'unassigned_count': unassigned_count,
+        'assigned_guests_count': total_assigned_guests,
         'occupied_hotels_count': occupied_hotels_count,
         'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
         'reservation_allocation_report': reservation_allocation_report,
@@ -126,8 +130,9 @@ def printed_reservation_allocation_report(reservation_allocation_result):
 
     # Print the overall statistics
     print("\nOverall Statistics:")
-    print(f"\nOverall Average Revenue: {reservation_allocation_result['average_revenue']}")
-    print(f"Average Satisfaction Score: {reservation_allocation_result['average_satisfaction_score']}")
-    print(f"\nNumber of Occupied Hotels: {reservation_allocation_result['occupied_hotels_count']}")
-
+    print(f"Total number of guests assigned: {reservation_allocation_result['assigned_guests_count']}")
+    print(f"Overall average degree of satisfaction: {reservation_allocation_result['average_satisfaction_score']:.2f}")
+    print(f"Total number of hotels occupied: {reservation_allocation_result['occupied_hotels_count']}")
+    print(f"Overall average revenue per hotel: {reservation_allocation_result['average_revenue']:.2f}")
+        
 printed_reservation_allocation_report(reservation_allocation_result)
