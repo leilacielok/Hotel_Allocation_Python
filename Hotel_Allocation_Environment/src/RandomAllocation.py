@@ -128,9 +128,9 @@ def print_random_allocation_report(random_allocation_result):
         print(f"Overall average revenue per hotel: {random_allocation_result['average_revenue']:.2f}")
         
         # Guest satisfaction scores
-        print("\nGuest Satisfaction Scores:")
-        for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
-            print(f"    '{guest_id}': {satisfaction:.2f}")
+        #print("\nGuest Satisfaction Scores:")
+        #for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
+        #    print(f"    '{guest_id}': {satisfaction:.2f}")
      
 # Call the function to print the report
 print_random_allocation_report(random_allocation_result)
