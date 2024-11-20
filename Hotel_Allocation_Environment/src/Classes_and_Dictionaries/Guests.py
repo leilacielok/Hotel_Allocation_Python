@@ -7,7 +7,7 @@ def create_guest(guest_id, discount, preferences):  # Function to create the obj
     return {'discount': discount, 'preferences': preferences}
 
 
-guests_dict = {} # initialize an empty dictionary
+guests_dict_original = {} # initialize an empty dictionary
 
 for i, row in guests_df.iterrows():  # iterate over each row in the dataframe
     guest_id = row['guest']
@@ -17,6 +17,6 @@ for i, row in guests_df.iterrows():  # iterate over each row in the dataframe
     guest_preferences = preferences_df[preferences_df['guest'] == guest_id]
     hotels_priority = guest_preferences['hotel'].tolist()  # List of hotels in priority order
    
-    guests_dict[guest_id] = create_guest(guest_id, discount, hotels_priority)
+    guests_dict_original[guest_id] = create_guest(guest_id, discount, hotels_priority)
 
-print(guests_dict)
+print(guests_dict_original)
