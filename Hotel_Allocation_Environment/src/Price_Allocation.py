@@ -27,27 +27,40 @@ def price_allocation(guests_dict, hotels_dict):
         
         for hotel_id in sorted_hotels:
             #Check that the hotel encountered in order of price is in preferences
-            if hotel_id in preferences:
-                # Check if hotel has available rooms
+            if hotel_id in preferences and hotels_dict[hotel_id]['available_rooms'] > 0:
+                # Allocate room
+                allocation[guest_id] = hotel_id
+                hotels_dict[hotel_id]['available_rooms'] -= 1
+                hotel_occupancy[hotel_id]['occupied_rooms'] += 1
+                hotel_occupancy[hotel_id]['guests'].append(guest_id) # Track which guests were allocated to this hotel
+                    
+                # Revenue of the hotel for this guest
+                discounted_price = hotels_dict[hotel_id]['price'] * (1 - discount)
+                guest_revenues[guest_id] = discounted_price # store revenue per guest
+                    
+                # Satisfaction score
+                guest_satisfaction[guest_id] = round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)  # Higher score for better match
+
+                allocated = True
+                break  # Stop and move to the next guest once allocated
+        
+        # If no hotel in preferences has available rooms, I allocate based on price
+        if not allocated:
+            for hotel_id in sorted_hotels:
                 if hotels_dict[hotel_id]['available_rooms'] > 0:
-                    # Allocate room
+                    # Allocate the guest to the cheapest available hotel
                     allocation[guest_id] = hotel_id
                     hotels_dict[hotel_id]['available_rooms'] -= 1
                     hotel_occupancy[hotel_id]['occupied_rooms'] += 1
-                    hotel_occupancy[hotel_id]['guests'].append(guest_id) # Track which guests were allocated to this hotel
-                    
-                    # Revenue of the hotel for this guest
-                    discounted_price = hotels_dict[hotel_id]['price'] * (1 - discount)
-                    guest_revenues[guest_id] = discounted_price # store revenue per guest
-                    
-                    # Satisfaction score
-                    guest_satisfaction[guest_id] = round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)  # Higher score for better match
+                    hotel_occupancy[hotel_id]['guests'].append(guest_id)
+                    guest_satisfaction[guest_id] = 0.1 # Penalty for being allocated to a hotel outside the preferences
 
                     allocated = True
-                    break  # Stop and move to the next guest once allocated
-        
+                    break
+                
         if not allocated:
             guest_satisfaction[guest_id] = 0  # No allocation = 0 satisfaction
+            guest_revenues[guest_id] = 0
 
     # Stats for unassigned guests
     unassigned_count = len([guest_id for guest_id in guests_dict if guest_id not in allocation]) #count how many guests were not assigned
@@ -59,7 +72,7 @@ def price_allocation(guests_dict, hotels_dict):
     for hotel_id, data in hotels_dict.items():
         occupied_rooms = hotel_occupancy[hotel_id]['occupied_rooms']
         guests = hotel_occupancy[hotel_id]['guests']
-        final_revenue = sum(guest_revenues[guest_id] for guest_id in guests)
+        final_revenue = sum(guest_revenues.get(guest_id, 0) for guest_id in guests)
         
         price_allocation_report[hotel_id] = {
             'rooms_occupied': occupied_rooms,
@@ -117,4 +130,10 @@ def printed_price_allocation_report(price_allocation_result):
     print(f"Average Satisfaction Score: {price_allocation_result['average_satisfaction_score']}")
 
 printed_price_allocation_report(price_allocation_result)
-print(printed_price_allocation_report)
+
+# Priority 1: Assign the guest to a hotel from their preferences, in order of price (since sorted_hotels is sorted by price).
+# Priority 2: If no preferred hotels are available, assign the guest to the cheapest available hotel.
+# Satisfaction Score:
+## If the guest is allocated to a preferred hotel, their satisfaction is based on how close the hotel is to their preference list.
+## If allocated to a non-preferred hotel, a penalty of 0.1 is applied.
+## If the guest is not allocated to any hotel, their satisfaction is set to 0.
