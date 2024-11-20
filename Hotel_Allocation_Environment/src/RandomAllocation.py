@@ -33,7 +33,7 @@ def random_allocation(guests_dict, hotels_dict):
             round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)
             if hotel_id in preferences else 0 # default score for hotels outside the preference list
         ) 
-        
+
         hotels_dict[hotel_id]['available_rooms'] -= 1 # update the number of available rooms in the hotel allocated
         
         # Store the allocation
@@ -102,9 +102,9 @@ def random_allocation(guests_dict, hotels_dict):
         'total_guests_count': total_guests
     }    
 
-
 # Call the random_allocation function
 random_allocation_result = random_allocation(guests_dict, hotels_dict)
+
 
 # Function to print the report
 def print_random_allocation_report(random_allocation_result):
@@ -128,10 +128,9 @@ def print_random_allocation_report(random_allocation_result):
         print(f"Overall average revenue per hotel: {random_allocation_result['average_revenue']:.2f}")
         
         # Guest satisfaction scores
-     #   print("\nGuest Satisfaction Scores:")
-     #   for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
-     #       print(f"    '{guest_id}': {satisfaction:.2f}")
-   
-        
+        print("\nGuest Satisfaction Scores:")
+        for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
+            print(f"    '{guest_id}': {satisfaction:.2f}")
+     
 # Call the function to print the report
 print_random_allocation_report(random_allocation_result)
