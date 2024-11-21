@@ -43,10 +43,5 @@ def plot_allocation_comparison(results_dict, hotels_dict):
     plt.legend()
     plt.show()
     
-## Heatmap for allocation density
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
 
-# Create DataFrame for heatmap
 
