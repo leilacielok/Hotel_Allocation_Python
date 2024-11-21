@@ -92,18 +92,20 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
     total_satisfaction_score = sum(guest_satisfaction.values())
     average_satisfaction_score = round(total_satisfaction_score / len(guests_dict), 2)  # Include unassigned guests to penalize the score
 
+    statistics = {
+        'assigned_guests_count': total_assigned_guests,
+        'average_satisfaction_score': average_satisfaction_score,
+        'occupied_hotels_count': occupied_hotels_count,
+        'average_revenue': average_revenue
+    }
+    
     # Return results for allocation, guests, and hotels
     return {
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
         'unassigned_count': unassigned_count,
-        'assigned_guests_count': total_assigned_guests,
-        'occupied_hotels_count': occupied_hotels_count,
-        'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
         'availability_allocation_report': availability_allocation_report,
-        'average_revenue': average_revenue,
-        'guest_satisfaction': guest_satisfaction,
-        'average_satisfaction_score': average_satisfaction_score
+        'statistics': statistics,
     }
 
 # Test the function
@@ -115,11 +117,6 @@ def printed_availability_allocation_report(availability_allocation_result):
     print(f"  {availability_allocation_result['unassigned_count']} guests were not assigned to any hotel.")
     print(f"  Unassigned Guests List: {availability_allocation_result['unassigned_guests']}")
     
-    # Print guests' satisfaction scores
-    print("\nCustomer Satisfaction Scores:")
-    for guest_id, satisfaction_score in availability_allocation_result['guest_satisfaction'].items():
-        print(f"  Guest {guest_id}: Satisfaction Score = {satisfaction_score}")
-
     # Print details for each hotel: Remaining Rooms, Occupied Rooms, and Revenue
     print("\nHotel Room Allocation and Revenue:")
     for hotel_id, report in availability_allocation_result['availability_allocation_report'].items():
@@ -131,9 +128,9 @@ def printed_availability_allocation_report(availability_allocation_result):
 
     # Print the overall statistics
     print("\nOverall Statistics:")
-    print(f"Total number of guests assigned: {availability_allocation_result['assigned_guests_count']}")
-    print(f"Overall average degree of satisfaction: {availability_allocation_result['average_satisfaction_score']}")
-    print(f"Total number of hotels occupied: {availability_allocation_result['occupied_hotels_count']}")
-    print(f"Overall average revenue per hotel: {availability_allocation_result['average_revenue']:.2f}")
+    print(f"Total number of guests assigned: {availability_allocation_result['statistics']['assigned_guests_count']}")
+    print(f"Overall average degree of satisfaction: {availability_allocation_result['statistics']['average_satisfaction_score']:.2f}")
+    print(f"Total number of hotels occupied: {availability_allocation_result['statistics']['occupied_hotels_count']}")
+    print(f"Overall average revenue per hotel: {availability_allocation_result['statistics']['average_revenue']:.2f}")
 
 printed_availability_allocation_report(availability_allocation_result)
