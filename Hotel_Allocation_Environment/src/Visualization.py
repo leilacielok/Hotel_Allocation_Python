@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import time
+import numpy as np
 
 # Function to measure execution time of a method: stores the results and time taken (dictionaries)
 def measure_execution_time(method_name, method, results_dict, times_dict):
@@ -23,7 +24,7 @@ def plot_execution_times(times_dict):
     plt.show()
 
 # Function to compare allocation results: line chart comparing allocation results across different methods.
-def plot_allocation_comparison(results_dict, hotels_dict):
+def time_comparison(results_dict, hotels_dict):
     hotels = list(hotels_dict.keys())
     allocation_counts = {method: [0] * len(hotels) for method in results_dict}
 
@@ -41,7 +42,78 @@ def plot_allocation_comparison(results_dict, hotels_dict):
     plt.ylabel('Number of Guests')
     plt.title('Allocation Comparison Across Methods')
     plt.legend()
-    plt.show()
+    plt.show() # non-blocking mode: allows to print also subsequent plots
+
+
+## Compare statistics across the allocation methods: the parameter is the list of the statistics dictionaries of the 4 methods
+# Keys are the guests count, the avg satisfaction, the hotels count, the avg revenue.
+def statistics_comparison(statistics_dicts):
+    allocation_methods = ['Price', 'Reservation', 'Random', 'Availability']  
     
+    # Extract values for each statistic across all allocation methods
+    assigned_guests_counts = [stats['assigned_guests_count'] for stats in statistics_dicts]
+    avg_satisfaction_scores = [stats['average_satisfaction_score'] for stats in statistics_dicts]
+    occupied_hotels_counts = [stats['occupied_hotels_count'] for stats in statistics_dicts]
+    avg_revenues = [stats['average_revenue'] for stats in statistics_dicts]
+    
+    # X-axis positions for each statistic group
+    x = np.arange(len(allocation_methods))  # x axis labels (allocation methods)
+    width = 0.5  # width of the bars for each statistic
+    
+    # Create subplots: 4 separate plots, one for each statistic
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns for 4 plots
+    axs = axs.flatten()  # Flatten the 2D array of axes to 1D for easier indexing
 
+    # Plot for Assigned Guests Count
+    bars = axs[0].bar(x, assigned_guests_counts, width, color='b')
+    axs[0].bar(x, assigned_guests_counts, width, color='b', label='Assigned Guests Count')
+    axs[0].set_title('Assigned Guests Count by Allocation Method')
+    axs[0].set_xlabel('Allocation Method')
+    axs[0].set_ylabel('Assigned Guests Count')
+    axs[0].set_xticks(x)
+    axs[0].set_xticklabels(allocation_methods)
+    axs[0].legend()
+    for bar, value in zip(bars, assigned_guests_counts):
+        axs[0].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value}", ha='center', va='bottom')
 
+    # Plot for Average Satisfaction Score
+    bars = axs[1].bar(x, avg_satisfaction_scores, width, color='r')
+    axs[1].bar(x, avg_satisfaction_scores, width, color='r', label='Avg Satisfaction Score')
+    axs[1].set_title('Average Satisfaction Score by Allocation Method')
+    axs[1].set_xlabel('Allocation Method')
+    axs[1].set_ylabel('Average Satisfaction Score')
+    axs[1].set_xticks(x)
+    axs[1].set_xticklabels(allocation_methods)
+    axs[1].legend()
+    for bar, value in zip(bars, avg_satisfaction_scores):
+        axs[1].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value:.2f}", ha='center', va='bottom')
+        
+    # Plot for Occupied Hotels Count
+    bars = axs[2].bar(x, occupied_hotels_counts, width, color='g')
+    axs[2].bar(x, occupied_hotels_counts, width, color='g', label='Occupied Hotels Count')
+    axs[2].set_title('Occupied Hotels Count by Allocation Method')
+    axs[2].set_xlabel('Allocation Method')
+    axs[2].set_ylabel('Occupied Hotels Count')
+    axs[2].set_xticks(x)
+    axs[2].set_xticklabels(allocation_methods)
+    axs[2].legend()
+    for bar, value in zip(bars, occupied_hotels_counts):
+        axs[2].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value}", ha='center', va='bottom')
+
+    # Plot for Average Revenue
+    bars = axs[3].bar(x, avg_revenues, width, color='orange')
+    axs[3].bar(x, avg_revenues, width, color='orange')
+    axs[3].set_title('Average Revenue by Allocation Method')
+    axs[3].set_xlabel('Allocation Method')
+    axs[3].set_ylabel('Average Revenue')
+    axs[3].set_xticks(x)
+    axs[3].set_xticklabels(allocation_methods)
+    axs[3].legend()
+    for bar, value in zip(bars, avg_revenues):
+            axs[3].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value:.2f}", ha='center', va='bottom')
+
+    # Adjust layout for a clean display
+    fig.tight_layout()
+
+    # Show the plots
+    plt.show()

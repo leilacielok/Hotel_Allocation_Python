@@ -4,6 +4,7 @@ import random
 from copy import deepcopy
 import matplotlib.pyplot as plt
 import time
+import logging
 
 # External functions
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
@@ -12,7 +13,7 @@ from src.Allocation_Methods.Price_Allocation import price_allocation, printed_pr
 from src.Allocation_Methods.Random_Allocation import random_allocation, print_random_allocation_report
 from src.Allocation_Methods.Availability_Allocation import availability_allocation, printed_availability_allocation_report
 from src.Allocation_Methods.Reservation_Allocation import reservation_allocation, printed_reservation_allocation_report
-from src.Visualization import plot_execution_times, plot_allocation_comparison
+from src.Visualization import plot_execution_times, time_comparison, statistics_comparison
 
 # Hotel Manager class
 class HotelManager:
@@ -21,27 +22,32 @@ class HotelManager:
         self.hotels_dict = deepcopy(hotels_dict_original)
         self.results = {} # store all allocations results by method
         self.times = {}
+        self.statistics = {}
         
     def reset_hotels(self):
         self.hotels_dict = deepcopy(hotels_dict_original)
     
     def run_random_allocation(self):
         self.results['Random'] = random_allocation(self.guests_dict, self.hotels_dict)
+        self.statistics['Random'] = self.results['Random']['statistics']  
         random_allocation_report = print_random_allocation_report(self.results['Random'])
         return random_allocation_report
 
     def run_reservation_allocation(self):
         self.results['Reservation'] = reservation_allocation(self.guests_dict, self.hotels_dict)
+        self.statistics['Reservation'] = self.results['Reservation']['statistics']  
         reservation_allocation_report = printed_reservation_allocation_report(self.results['Reservation'])
         return reservation_allocation_report
     
     def run_price_allocation(self):
         self.results['Price'] = price_allocation(self.guests_dict, self.hotels_dict)
+        self.statistics['Price'] = self.results['Price']['statistics'] 
         price_allocation_report = printed_price_allocation_report(self.results['Price'])
         return price_allocation_report
     
     def run_availability_allocation(self):
         self.results['Availability'] = availability_allocation(self.guests_dict, self.hotels_dict)
+        self.statistics['Availability'] = self.results['Availability']['statistics'] 
         availability_allocation_report = printed_availability_allocation_report(self.results['Availability'])
         return availability_allocation_report
     
@@ -54,11 +60,16 @@ class HotelManager:
         
         self.results[method_name] = result
         self.times[method_name] = elapsed_time
+        self.statistics[method_name] = result['statistics']
         
         report = report_function(result)
         return report
 
     def run_all_methods(self):
+        print("\nRunning Random Allocation...")
+        self.reset_hotels()
+        print(self.run_allocations("Random", random_allocation, print_random_allocation_report))
+        
         print("Running Reservation Allocation...")
         self.reset_hotels()
         print(self.run_allocations("Reservation", reservation_allocation, printed_reservation_allocation_report))
@@ -66,10 +77,6 @@ class HotelManager:
         print("\nRunning Price Allocation...")
         self.reset_hotels()
         print(self.run_allocations("Price", price_allocation, printed_price_allocation_report))
-
-        print("\nRunning Random Allocation...")
-        self.reset_hotels()
-        print(self.run_allocations("Random", random_allocation, print_random_allocation_report))
         
         print("\nRunning Availability Allocation...")
         self.reset_hotels()
@@ -85,10 +92,13 @@ if __name__ == "__main__":
     print("Running Individual Allocations...")
     manager.reset_hotels()
     print(manager.run_reservation_allocation())
+    
     manager.reset_hotels()
     print(manager.run_price_allocation())
+    
     manager.reset_hotels()
     print(manager.run_random_allocation())
+    
     manager.reset_hotels()
     print(manager.run_availability_allocation())
 
@@ -97,11 +107,13 @@ if __name__ == "__main__":
     manager.run_all_methods()
 
     # Visualize results
+    print("\nVisualizing Statistics across Allocation Methods ...")
+    statistics_comparison(list(manager.statistics.values()))  # Pass the list of statistics for comparison
+ 
     print("\nVisualizing Execution Times...")
     plot_execution_times(manager.times)
 
-    print("\nVisualizing Allocation Comparison...")
-    plot_allocation_comparison(manager.results, manager.hotels_dict)
+    print("\nVisualizing Execution Times across Allocation Methods...")
+    time_comparison(manager.results, manager.hotels_dict)
     
-
- 
+    
