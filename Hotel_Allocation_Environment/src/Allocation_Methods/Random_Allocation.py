@@ -96,15 +96,17 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
         
     #allocation['average_satisfaction'] = average_satisfaction_score # add the value to the allocation
     
+    statistics = {
+        'assigned_guests_count': total_guests,
+        'average_satisfaction_score': average_satisfaction_score,
+        'occupied_hotels_count': occupied_hotels_count,
+        'average_revenue': average_revenue,
+    }
+    
     return {
         'allocation': allocation,
         'random_allocation_report': random_allocation_report,
-        'occupied_hotels_count': occupied_hotels_count,
-        'remaining_rooms': {hotel_id: hotels_dict[hotel_id]['available_rooms'] for hotel_id in hotels_dict},
-        'average_revenue': average_revenue,
-        'guest_satisfaction': guest_satisfaction,
-        'average_satisfaction_score': average_satisfaction_score,
-        'total_guests_count': total_guests
+        'statistics': statistics,
     }    
 
 # Call the random_allocation function
@@ -113,30 +115,22 @@ random_allocation_result = random_allocation(guests_dict_original, hotels_dict_o
 
 # Function to print the report
 def print_random_allocation_report(random_allocation_result):
-    # Access random_allocation_report from the random_allocation_result dictionary
-    if 'random_allocation_report' in random_allocation_result:
-        # Guest satisfaction scores
-        print("\nGuest Satisfaction Scores:")
-        for guest_id, satisfaction in random_allocation_result['guest_satisfaction'].items():
-            print(f"    '{guest_id}': {satisfaction:.2f}")
-            
-        print("Hotel Allocation Report:")
-        for hotel, details in random_allocation_result['random_allocation_report'].items():
-            print(f"'{hotel}': {{")
-            print(f"    'occupied_rooms': {details['occupied_rooms']},")
-            print(f"    'available_rooms': {details['available_rooms']},")
-            print(f"    'number_of_guests_accommodated': {details['number_of_guests_accommodated']},")
-            print(f"    'final_revenue': {details['revenue']:.2f},")
-            print(f"    'guests': {details['guests']}")
-            print("}")
+    print("Hotel Allocation Report:")
+    for hotel, details in random_allocation_result['random_allocation_report'].items():
+        print(f"'{hotel}': {{")
+        print(f"    'occupied_rooms': {details['occupied_rooms']},")
+        print(f"    'available_rooms': {details['available_rooms']},")
+        print(f"    'number_of_guests_accommodated': {details['number_of_guests_accommodated']},")
+        print(f"    'final_revenue': {details['revenue']:.2f},")
+        print(f"    'guests': {details['guests']}")
+        print("}")
         
-        # Overall statistics
-        print("\nOverall Statistics:")
-        print(f"Total number of guests assigned: {random_allocation_result['total_guests_count']}")
-        print(f"Overall average degree of satisfaction: {random_allocation_result['average_satisfaction_score']:.2f}")
-        print(f"Total number of hotels occupied: {random_allocation_result['occupied_hotels_count']}")
-        print(f"Overall average revenue per hotel: {random_allocation_result['average_revenue']:.2f}")
-        
-     
+      # Overall statistics
+    print("\nOverall Statistics:")
+    print(f"Total number of guests assigned: {random_allocation_result['statistics']['assigned_guests_count']}")
+    print(f"Overall average degree of satisfaction: {random_allocation_result['statistics']['average_satisfaction_score']:.2f}")
+    print(f"Total number of hotels occupied: {random_allocation_result['statistics']['occupied_hotels_count']}")
+    print(f"Overall average revenue per hotel: {random_allocation_result['statistics']['average_revenue']:.2f}")
+
 # Call the function to print the report
 print_random_allocation_report(random_allocation_result)
