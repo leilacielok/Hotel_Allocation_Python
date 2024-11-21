@@ -1,6 +1,6 @@
 import pandas as pd
-from src.Classes_and_Dictionaries.Guests import guests_dict_original
-from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
+from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
+from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
 def availability_allocation(guests_dict_original, hotels_dict_original):
     

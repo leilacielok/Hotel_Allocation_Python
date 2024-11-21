@@ -8,8 +8,8 @@ from src.Allocation_Methods.Reservation_Allocation import reservation_allocation
 from src.Allocation_Methods.Price_Allocation import price_allocation, printed_price_allocation_report
 from src.Allocation_Methods.Random_Allocation import random_allocation, print_random_allocation_report
 from src.Allocation_Methods.Availability_Allocation import availability_allocation, printed_availability_allocation_report
-from src.Classes_and_Dictionaries.Guests import guests_dict_original
-from src.Classes_and_Dictionaries.Hotels import hotels_dict_original
+from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
+from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
 # Hotel Manager class
 class HotelManager:
