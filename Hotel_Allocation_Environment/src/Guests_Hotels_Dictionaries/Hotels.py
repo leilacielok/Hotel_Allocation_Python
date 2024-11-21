@@ -1,9 +1,3 @@
-#class hotels:
-   # def __init__(self, hotel_id, available_rooms, price):
-      #  self.hotel_id = hotel_id
-     #   self.available_rooms = available_rooms
-    #    self.price = price
-
 from src.Data_loading import load_data
 hotels_df, guests_df, preferences_df = load_data()
 
