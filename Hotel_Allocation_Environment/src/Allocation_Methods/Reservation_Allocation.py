@@ -3,14 +3,23 @@ from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
 def reservation_allocation(guests_dict_original, hotels_dict_original):
-    
+    """
+    ## Parameters: 
+     - Dictionary containing guests information: guest_id, discount, preferences list.
+     - Dictionary containing hotels information: hotel_id, available_rooms, price.
+    ## Returns a dictionary:
+     - Allocation: for each hotel, number of rooms occupied, rooms available, total revenue, list of guests allocated.
+     - Unassigned guests (count and list).
+     - Allocation report: 0 for non-occupied hotels.
+     - Overall statistics: count of assigned guests, avg satisfaction, couhnt of occupied hotels, avg revenue.
+    """   
     # Make copies of the dictionaries to prevent modifying the originals
-    guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
-    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
-    
-    allocation = {} # store the allocation
+    guests_dict = guests_dict_original.copy()  
+    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  
+    allocation = {} 
 
-    hotel_status = { # initialize Hotel status
+    # Initialize hotel status
+    hotel_status = { 
         hotel_id: {
             'rooms_occupied': 0,
             'remaining_rooms': hotels_dict[hotel_id]['available_rooms'],
@@ -80,15 +89,14 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         } 
     
     # Calculate total number of guests assigned
-    total_assigned_guests = len(allocation)  # Number of guests assigned to hotels
+    total_assigned_guests = len(allocation)  
     
-    # Now I have all the details I need to compute total and average revenue
     # Total and overall average revenue
     total_revenues = sum(details['final_revenue'] for details in reservation_allocation_report.values())
     occupied_hotels_count = sum(1 for details in reservation_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0 # don't divide by 0
     
-    # Satisfaction score
+    # Avg satisfaction score
     average_satisfaction_score = round(total_satisfaction / len(guests_dict), 2) # I include unassigned guest to penalize the final score
 
     statistics = {
@@ -98,7 +106,6 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
-#   return the results for allocation, guests and hotels.
     return{
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
@@ -108,9 +115,10 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         'statistics': statistics,
     } 
 
+# Store the function
 reservation_allocation_result = reservation_allocation(guests_dict_original, hotels_dict_original)
 
-
+# Improve readability
 def printed_reservation_allocation_report(reservation_allocation_result):
     # Print Unassigned Guests
     print("\nUnassigned Guests:")

@@ -5,10 +5,19 @@ from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
 
 def random_allocation(guests_dict_original, hotels_dict_original, verbose = False):
-    
+    """
+    ## Parameters: 
+     - Dictionary containing guests information: guest_id, discount, preferences list.
+     - Dictionary containing hotels information: hotel_id, available_rooms, price.
+     - verbose = False: I do not want line 36 to be printed in the main.py.
+    ## Returns a dictionary:
+     - Allocation: for each hotel, number of rooms occupied, rooms available, total revenue, number and list of guests allocated.
+     - Allocation report: includes values of 0 in occupied rooms, revenue and guests for non-allocated hotels.
+     - Overall statistics: count of assigned guests, avg satisfaction, couhnt of occupied hotels, avg revenue.
+    """   
     # Make copies of the dictionaries to prevent modifying the originals
-    guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
-    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
+    guests_dict = guests_dict_original.copy()  
+    hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  
     
     # 1: shuffle the list of guest IDs for randoma allocation (Numpy)
     # 2: Dictionary to store allocation and satisfaction details
@@ -41,10 +50,10 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
 
         hotels_dict[hotel_id]['available_rooms'] -= 1 # update the number of available rooms in the hotel allocated
         
-        # Store the allocation
-        if hotel_id not in allocation: # 'new' hotel in the allocation dictionary
+        # Store the allocation: if the hotel is 'new' to the allocation dictionary, start with 1 occupied room.
+        if hotel_id not in allocation:
             allocation[hotel_id] = {
-                'occupied_rooms': 1, # one room occupied at the first allocation
+                'occupied_rooms': 1, 
                 'available_rooms': hotels_dict[hotel_id]['available_rooms'],
                 'discount_applied': guest_discount,
                 'revenue': revenue,
@@ -52,12 +61,12 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
                 'guests': [guest_id_str],
             }
 
-        else: # If the hotel is already in allocation
-            allocation[hotel_id]['occupied_rooms'] += 1  # Increment the number of occupied rooms
+        else: # If the hotel is already in allocation: increment occupied rooms, revenue, and guests. Update number of available rooms.
+            allocation[hotel_id]['occupied_rooms'] += 1 
             allocation[hotel_id]['available_rooms'] = hotels_dict[hotel_id]['available_rooms']
-            allocation[hotel_id]['revenue'] += revenue # add to the total revenue    
+            allocation[hotel_id]['revenue'] += revenue    
             allocation[hotel_id]['number_of_guests_accommodated'] += 1            
-            allocation[hotel_id]['guests'].append(guest_id_str)  # Add the guest to the guest list
+            allocation[hotel_id]['guests'].append(guest_id_str) 
     
         # track satisfaction for the guest
         guest_satisfaction[guest_id_str] = satisfaction_score
@@ -81,7 +90,7 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
             'occupied_rooms': 0,
             'available_rooms': data['available_rooms'],
             'discount_applied': None,
-            'revenue': 0,  # Default revenue
+            'revenue': 0,  
             'number_of_guests_accommodated': 0,
             'guests': [],
         }
@@ -109,11 +118,11 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
         'statistics': statistics,
     }    
 
-# Call the random_allocation function
+# Store the random_allocation function
 random_allocation_result = random_allocation(guests_dict_original, hotels_dict_original)
 
 
-# Function to print the report
+# Improve readability
 def print_random_allocation_report(random_allocation_result):
     print("Hotel Allocation Report:")
     for hotel, details in random_allocation_result['random_allocation_report'].items():

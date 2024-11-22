@@ -1,14 +1,28 @@
-# First, Hotels are sorted by price, ensuring cheaper options are considered first.
-# Guests are processed in the natural order of their IDs, so in order of reservation.
-# Preference Matching: For each guest, I iterate through their preferences to find the first available room in their order of priorities.
-# Once a room is allocated I can move to the next guest.
-
 import pandas as pd
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
+"""
+Concept:
+- Assign the guest to a hotel from their preferences, in order of price (since sorted_hotels is sorted by price).
+  Guests are processed in the natural order of their IDs, so in order of reservation.
+- If no preferred hotels are available, I decided to assign the guest to the cheapest available hotel.
+Satisfaction Score:
+- If the guest is allocated to a preferred hotel, their satisfaction is based on the index of the hotel in their preferences list.
+- If the guest is allocated to a non-preferred hotel, a penalty of 0.1 is applied.
+- If the guest is not allocated to any hotel, their satisfaction score is 0.
+"""
+
 def price_allocation(guests_dict_original, hotels_dict_original):
-    
+    """
+    ## Parameters: 
+     - Dictionary containing guests information: guest_id, discount, preferences list.
+     - Dictionary containing hotels information: hotel_id, available_rooms, price.
+    ## Returns:
+     - Allocation report (dictionary): for each hotel, number of rooms occupied, rooms available, total revenue, list of guests allocated.
+     - Unassigned guests (count and list).
+     - Overall statistics (dictionary): count of assigned guests, avg satisfaction, couhnt of occupied hotels, avg revenue.
+    """   
     # Make copies of the dictionaries to prevent modifying the originals
     guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
     hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
@@ -116,6 +130,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
     
 price_allocation_result = price_allocation(guests_dict_original, hotels_dict_original)
 
+# Improve readability
 def printed_price_allocation_report(price_allocation_result):
     # Print Unassigned Guests 
     print("\nUnassigned Guests:")
@@ -140,9 +155,3 @@ def printed_price_allocation_report(price_allocation_result):
 
 printed_price_allocation_report(price_allocation_result)
 
-# Priority 1: Assign the guest to a hotel from their preferences, in order of price (since sorted_hotels is sorted by price).
-# Priority 2: If no preferred hotels are available, assign the guest to the cheapest available hotel.
-# Satisfaction Score:
-## If the guest is allocated to a preferred hotel, their satisfaction is based on how close the hotel is to their preference list.
-## If allocated to a non-preferred hotel, a penalty of 0.1 is applied.
-## If the guest is not allocated to any hotel, their satisfaction is set to 0.

@@ -3,31 +3,40 @@ from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
 
 def availability_allocation(guests_dict_original, hotels_dict_original):
-    
-    # Make copies of the dictionaries to prevent modifying the originals
+    """
+    ## Parameters: 
+     - Dictionary containing guests information: guest_id, discount, preferences list.
+     - Dictionary containing hotels information: hotel_id, available_rooms, price.
+    ## Returns:
+     - Allocation report (dictionary): for each hotel, number of rooms occupied, rooms available, total revenue, list of guests allocated.
+     - Unassigned guests (count and list).
+     - Overall statistics (dictionary): count of assigned guests, avg satisfaction, couhnt of occupied hotels, avg revenue.
+    """
+    # Make copies of the dictionaries to prevent the function from modifying the originals
     guests_dict = guests_dict_original.copy()  # Copy the guest dictionary
     hotels_dict = {k: v.copy() for k, v in hotels_dict_original.items()}  # Deep copy of the hotels dictionary
     
-    # 1: Sort hotels by available rooms in descending order
-    hotels_df = pd.DataFrame(hotels_dict).T  # Transpose to flip the dictionary
-    sorted_hotels = hotels_df.sort_values(by='available_rooms', ascending=False).index  # Sort by available rooms
+    # Sort hotels by available rooms in descending order (starting from most roomy)
+    hotels_df = pd.DataFrame(hotels_dict).T  
+    sorted_hotels = hotels_df.sort_values(by='available_rooms', ascending=False).index  
     
-    # Store statistics
+    # Store statistics: result of the allocation, initialize hotel occupancy, revenue per guest, satisfaction score per guest.
     allocation = {}
     hotel_occupancy = {hotel_id: {'occupied_rooms': 0, 'guests': []} for hotel_id in hotels_dict}
-    guest_revenues = {}  # Revenue per guest
-    guest_satisfaction = {}  # Satisfaction score for each guest
+    guest_revenues = {}  
+    guest_satisfaction = {}  
     
-    # Step 2: Process guests in ID order (reservation order)
-    for guest_id, guest_info in sorted(guests_dict.items()): # sort guests by their ids: reservation order
-        preferences = guest_info['preferences'] # Retrieve the preferences for each guest
-        discount = guest_info.get('discount', 0) # Retrieve discount rate for each guest
+    # Process guests in ID order (reservation order): sort by guest_id, retrieve preferences list and discount rate.
+    for guest_id, guest_info in sorted(guests_dict.items()): 
+        preferences = guest_info['preferences'] 
+        discount = guest_info.get('discount', 0) 
         allocated = False
         
+        # Considering sorted hotels in order of price, allocate each guest to a preferred hotel with available rooms
+        # If a match is found, the room is allocated, hotel stats are updated, and guest satisfaction is calculated.
         for hotel_id in sorted_hotels:
-            # Check if the hotel encountered in order of availability is in preferences
             if hotel_id in preferences and hotels_dict[hotel_id]['available_rooms'] > 0:
-                # Allocate room
+                
                 allocation[guest_id] = hotel_id
                 hotels_dict[hotel_id]['available_rooms'] -= 1
                 hotel_occupancy[hotel_id]['occupied_rooms'] += 1
@@ -37,13 +46,13 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
                 discounted_price = hotels_dict[hotel_id]['price'] * (1 - discount)
                 guest_revenues[guest_id] = discounted_price  # Store revenue per guest
                 
-                # Satisfaction score
                 guest_satisfaction[guest_id] = round((len(preferences) - preferences.index(hotel_id)) / len(preferences), 2)  # Higher score for better match
 
                 allocated = True
                 break  # Stop and move to the next guest once allocated
         
-        # If no hotel in preferences has available rooms, allocate based on availability order
+        # If no hotel in preferences has available rooms, allocate based on availability order.
+        # In this case, guests' satisfaction scores suffer a penalty for being allocated outside preferences.
         if not allocated:
             for hotel_id in sorted_hotels:
                 if hotels_dict[hotel_id]['available_rooms'] > 0:
@@ -52,20 +61,22 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
                     hotels_dict[hotel_id]['available_rooms'] -= 1
                     hotel_occupancy[hotel_id]['occupied_rooms'] += 1
                     hotel_occupancy[hotel_id]['guests'].append(guest_id)
-                    guest_satisfaction[guest_id] = 0.1  # Penalty for being allocated outside preferences
+                    guest_satisfaction[guest_id] = 0.1
 
                     allocated = True
                     break
-                
+        
+        # Guests not allocated any room receive a satisfaction score of 0       
         if not allocated:
-            guest_satisfaction[guest_id] = 0  # No allocation = 0 satisfaction
+            guest_satisfaction[guest_id] = 0  
             guest_revenues[guest_id] = 0
 
-    # Stats for unassigned guests
-    unassigned_count = len([guest_id for guest_id in guests_dict if guest_id not in allocation])  # Count unassigned guests
-    unassigned_guests = [guest_id for guest_id in guests_dict if guest_id not in allocation]  # List unassigned guest ids
+    # Stats for assigned unassigned guests: count and list.
+    unassigned_count = len([guest_id for guest_id in guests_dict if guest_id not in allocation]) 
+    unassigned_guests = [guest_id for guest_id in guests_dict if guest_id not in allocation]  
+    total_assigned_guests = len(allocation)  
 
-    # Hotel report
+    # Stats for hotel report (calculated for each hotel after the allocation process)
     availability_allocation_report = {}
 
     for hotel_id, data in hotels_dict.items():
@@ -81,9 +92,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
             'guests': guests
         }
     
-    total_assigned_guests = len(allocation)  # Number of guests assigned to hotels
-
-    # Now compute total and average revenue
+    # Total and average revenue of the allocation method
     total_revenues = sum(details['final_revenue'] for details in availability_allocation_report.values())
     occupied_hotels_count = sum(1 for details in availability_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0  # Avoid division by zero
@@ -108,7 +117,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'statistics': statistics,
     }
 
-# Test the function
+# Store the function
 availability_allocation_result = availability_allocation(guests_dict_original, hotels_dict_original)
 
 def printed_availability_allocation_report(availability_allocation_result):
@@ -133,4 +142,5 @@ def printed_availability_allocation_report(availability_allocation_result):
     print(f"Total number of hotels occupied: {availability_allocation_result['statistics']['occupied_hotels_count']}")
     print(f"Overall average revenue per hotel: {availability_allocation_result['statistics']['average_revenue']:.2f}")
 
+# Store printed output (improved readability)
 printed_availability_allocation_report(availability_allocation_result)
