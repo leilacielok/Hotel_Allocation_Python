@@ -15,13 +15,14 @@ def measure_execution_time(method_name, method, results_dict, times_dict):
 def plot_execution_times(times_dict):
     methods = list(times_dict.keys())
     times = list(times_dict.values())
+    
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.bar(methods, times, color='skyblue')
+    ax.set_xlabel('Allocation Methods')
+    ax.set_ylabel('Execution Time (seconds)')
+    ax.set_title('Comparison of Execution Times for Allocation Methods')
 
-    plt.figure(figsize=(8, 6))
-    plt.bar(methods, times, color='skyblue')
-    plt.xlabel('Allocation Methods')
-    plt.ylabel('Execution Time (seconds)')
-    plt.title('Comparison of Execution Times for Allocation Methods')
-    plt.show()
+    return fig
 
 # Function to compare allocation results: line chart comparing allocation results across different methods.
 def time_comparison(results_dict, hotels_dict):
@@ -42,31 +43,27 @@ def time_comparison(results_dict, hotels_dict):
     plt.ylabel('Number of Guests')
     plt.title('Allocation Comparison Across Methods')
     plt.legend()
-    plt.show() # non-blocking mode: allows to print also subsequent plots
 
 
 ## Compare statistics across the allocation methods: the parameter is the list of the statistics dictionaries of the 4 methods
 # Keys are the guests count, the avg satisfaction, the hotels count, the avg revenue.
 def statistics_comparison(statistics_dicts):
     allocation_methods = ['Price', 'Reservation', 'Random', 'Availability']  
-    
+    x = np.arange(len(allocation_methods))  # x axis labels (allocation methods)
+    width = 0.5  # width of the bars for each statistic
+
     # Extract values for each statistic across all allocation methods
     assigned_guests_counts = [stats['assigned_guests_count'] for stats in statistics_dicts]
     avg_satisfaction_scores = [stats['average_satisfaction_score'] for stats in statistics_dicts]
     occupied_hotels_counts = [stats['occupied_hotels_count'] for stats in statistics_dicts]
     avg_revenues = [stats['average_revenue'] for stats in statistics_dicts]
-    
-    # X-axis positions for each statistic group
-    x = np.arange(len(allocation_methods))  # x axis labels (allocation methods)
-    width = 0.5  # width of the bars for each statistic
-    
+        
     # Create subplots: 4 separate plots, one for each statistic
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns for 4 plots
     axs = axs.flatten()  # Flatten the 2D array of axes to 1D for easier indexing
 
     # Plot for Assigned Guests Count
-    bars = axs[0].bar(x, assigned_guests_counts, width, color='b')
-    axs[0].bar(x, assigned_guests_counts, width, color='b', label='Assigned Guests Count')
+    bars = axs[0].bar(x, assigned_guests_counts, width, color='b', label = 'Assigned Guests Count')
     axs[0].set_title('Assigned Guests Count by Allocation Method')
     axs[0].set_xlabel('Allocation Method')
     axs[0].set_ylabel('Assigned Guests Count')
@@ -77,8 +74,7 @@ def statistics_comparison(statistics_dicts):
         axs[0].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value}", ha='center', va='bottom')
 
     # Plot for Average Satisfaction Score
-    bars = axs[1].bar(x, avg_satisfaction_scores, width, color='r')
-    axs[1].bar(x, avg_satisfaction_scores, width, color='r', label='Avg Satisfaction Score')
+    bars = axs[1].bar(x, avg_satisfaction_scores, width, color='r', label='Avg Satisfaction Score')
     axs[1].set_title('Average Satisfaction Score by Allocation Method')
     axs[1].set_xlabel('Allocation Method')
     axs[1].set_ylabel('Average Satisfaction Score')
@@ -89,8 +85,7 @@ def statistics_comparison(statistics_dicts):
         axs[1].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value:.2f}", ha='center', va='bottom')
         
     # Plot for Occupied Hotels Count
-    bars = axs[2].bar(x, occupied_hotels_counts, width, color='g')
-    axs[2].bar(x, occupied_hotels_counts, width, color='g', label='Occupied Hotels Count')
+    bars = axs[2].bar(x, occupied_hotels_counts, width, color='g', label='Occupied Hotels Count')
     axs[2].set_title('Occupied Hotels Count by Allocation Method')
     axs[2].set_xlabel('Allocation Method')
     axs[2].set_ylabel('Occupied Hotels Count')
@@ -101,8 +96,7 @@ def statistics_comparison(statistics_dicts):
         axs[2].text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value}", ha='center', va='bottom')
 
     # Plot for Average Revenue
-    bars = axs[3].bar(x, avg_revenues, width, color='orange')
-    axs[3].bar(x, avg_revenues, width, color='orange')
+    bars = axs[3].bar(x, avg_revenues, width, color='orange', label = 'Average Revenue')
     axs[3].set_title('Average Revenue by Allocation Method')
     axs[3].set_xlabel('Allocation Method')
     axs[3].set_ylabel('Average Revenue')
@@ -114,6 +108,8 @@ def statistics_comparison(statistics_dicts):
 
     # Adjust layout for a clean display
     fig.tight_layout()
+    
+    return fig
 
-    # Show the plots
-    plt.show()
+
+

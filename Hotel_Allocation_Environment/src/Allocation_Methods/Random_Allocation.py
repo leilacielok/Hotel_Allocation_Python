@@ -121,25 +121,13 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
 # Store the random_allocation function
 random_allocation_result = random_allocation(guests_dict_original, hotels_dict_original)
 
-
-# Improve readability
+# Needed to pass the report to the main file
 def print_random_allocation_report(random_allocation_result):
-    print("Hotel Allocation Report:")
-    for hotel, details in random_allocation_result['random_allocation_report'].items():
-        print(f"'{hotel}': {{")
-        print(f"    'occupied_rooms': {details['occupied_rooms']},")
-        print(f"    'available_rooms': {details['available_rooms']},")
-        print(f"    'number_of_guests_accommodated': {details['number_of_guests_accommodated']},")
-        print(f"    'final_revenue': {details['revenue']:.2f},")
-        print(f"    'guests': {details['guests']}")
-        print("}")
-        
-      # Overall statistics
-    print("\nOverall Statistics:")
-    print(f"Total number of guests assigned: {random_allocation_result['statistics']['assigned_guests_count']}")
-    print(f"Overall average degree of satisfaction: {random_allocation_result['statistics']['average_satisfaction_score']:.2f}")
-    print(f"Total number of hotels occupied: {random_allocation_result['statistics']['occupied_hotels_count']}")
-    print(f"Overall average revenue per hotel: {random_allocation_result['statistics']['average_revenue']:.2f}")
+    # Assuming the result has a 'price_allocation_report' key that contains the report
+    allocation_report = random_allocation_result.get('random_allocation_report', None)
+    
+    # Generate a string report
+    report = f"Allocation Report:\n{allocation_report}"
+    
+    return report
 
-# Call the function to print the report
-print_random_allocation_report(random_allocation_result)

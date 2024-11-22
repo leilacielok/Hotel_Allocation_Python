@@ -121,37 +121,22 @@ def price_allocation(guests_dict_original, hotels_dict_original):
     
     # return the results for allocation, guests and hotels.
     return{
-        'allocation': allocation,
-        'unassigned_guests': unassigned_guests,
-        'unassigned_count': unassigned_count,
+       # 'allocation': allocation,
+       # 'unassigned_guests': unassigned_guests,
+       # 'unassigned_count': unassigned_count,
         'price_allocation_report': price_allocation_report,
         'statistics': statistics,
     }    
     
 price_allocation_result = price_allocation(guests_dict_original, hotels_dict_original)
 
-# Improve readability
+
+## Needed to pass the report to the main file
 def printed_price_allocation_report(price_allocation_result):
-    # Print Unassigned Guests 
-    print("\nUnassigned Guests:")
-    print(f"  {price_allocation_result['unassigned_count']} guests were not assigned to any hotel.")
-    print(f"  Unassigned Guests List: {price_allocation_result['unassigned_guests']}")
-
-    # Print details for each hotel: Remaining Rooms, Occupied Rooms, and Revenue
-    print("\nHotel Room Allocation and Revenue:")
-    for hotel_id, report in price_allocation_result['price_allocation_report'].items():
-        print(f"\n{hotel_id}:")
-        print(f"  Remaining Rooms: {report['rooms_available']}")
-        print(f"  Occupied Rooms: {report['rooms_occupied']}")
-        print(f"  Revenue: {report['final_revenue']}")
-        print(f"  Assigned Guests: {report['guests']}")  # Printing the list of assigned guests
-
-    # Print the overall statistics
-    print("\nOverall Statistics:")
-    print(f"Total number of guests assigned: {price_allocation_result['statistics']['assigned_guests_count']}")
-    print(f"Overall average degree of satisfaction: {price_allocation_result['statistics']['average_satisfaction_score']:.2f}")
-    print(f"Total number of hotels occupied: {price_allocation_result['statistics']['occupied_hotels_count']}")
-    print(f"Overall average revenue per hotel: {price_allocation_result['statistics']['average_revenue']:.2f}")
-
-printed_price_allocation_report(price_allocation_result)
+    allocation_report = price_allocation_result.get('price_allocation_report', None)
+    
+    # Generate a string report
+    report = f"Allocation Report:\n{allocation_report}"
+    
+    return report
 

@@ -118,27 +118,13 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
 # Store the function
 reservation_allocation_result = reservation_allocation(guests_dict_original, hotels_dict_original)
 
-# Improve readability
+
+# Needed to pass the report to the main file
 def printed_reservation_allocation_report(reservation_allocation_result):
-    # Print Unassigned Guests
-    print("\nUnassigned Guests:")
-    print(f"  {reservation_allocation_result['unassigned_count']} guests were not assigned to any hotel.")
-    print(f"  Unassigned Guests List: {reservation_allocation_result['unassigned_guests']}")
+    allocation_report = reservation_allocation_result.get('reservation_allocation_report', None)
+   
+    # Generate a string report or any formatted output here
+    report = f"Allocation Report:\n{allocation_report}"
     
-    # Print details for each hotel: Remaining Rooms, Occupied Rooms, and Revenue
-    print("\nHotel Room Allocation and Revenue:")
-    for hotel_id, report in reservation_allocation_result['reservation_allocation_report'].items():
-        print(f"\n{hotel_id}:")
-        print(f"  Remaining Rooms: {report['rooms_available']}")
-        print(f"  Occupied Rooms: {report['rooms_occupied']}")
-        print(f"  Revenue: {report['final_revenue']}")
-        print(f"  Assigned Guests: {report['guests']}")  # Printing the list of assigned guests
+    return report
 
-    # Print the overall statistics
-    print("\nOverall Statistics:")
-    print(f"Total number of guests assigned: {reservation_allocation_result['statistics']['assigned_guests_count']}")
-    print(f"Overall average degree of satisfaction: {reservation_allocation_result['statistics']['average_satisfaction_score']:.2f}")
-    print(f"Total number of hotels occupied: {reservation_allocation_result['statistics']['occupied_hotels_count']}")
-    print(f"Overall average revenue per hotel: {reservation_allocation_result['statistics']['average_revenue']:.2f}")
-
-printed_reservation_allocation_report(reservation_allocation_result)
