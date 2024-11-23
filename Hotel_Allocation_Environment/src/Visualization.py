@@ -111,5 +111,3 @@ def statistics_comparison(statistics_dicts):
     
     return fig
 
-
-

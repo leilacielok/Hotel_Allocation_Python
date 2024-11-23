@@ -1,8 +1,15 @@
 import numpy as np
 import random
+import seaborn as sns
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
-
+from src.Data_Visualization.random_visualization import (
+    plot_occupancy_distribution, 
+    plot_revenue_distribution,
+    plot_guest_satisfaction_distribution,
+    plot_guests_per_hotel,
+)
+                
 
 def random_allocation(guests_dict_original, hotels_dict_original, verbose = False):
     """
@@ -84,16 +91,16 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
                 'number_of_guests_accommodated': details['number_of_guests_accommodated'],
                 'guests': details['guests'],
             }
-    else:
-        # Initialize with default values for hotels with no allocation
-        random_allocation_report[hotel_id] = {
-            'occupied_rooms': 0,
-            'available_rooms': data['available_rooms'],
-            'discount_applied': None,
-            'revenue': 0,  
-            'number_of_guests_accommodated': 0,
-            'guests': [],
-        }
+        else:
+            # Initialize with default values for hotels with no allocation
+            random_allocation_report[hotel_id] = {
+                'occupied_rooms': 0,
+                'available_rooms': data['available_rooms'],
+                'discount_applied': None,
+                'revenue': 0,  
+                'number_of_guests_accommodated': 0,
+                'guests': [],
+            }
     
     # Overall statistics 
     total_guests = len(guest_satisfaction)
@@ -112,11 +119,24 @@ def random_allocation(guests_dict_original, hotels_dict_original, verbose = Fals
         'average_revenue': average_revenue,
     }
     
+    # Generate visualizations
+    fig1 = plot_occupancy_distribution(allocation)
+    print("Plot 1 generated:", fig1)
+    fig2 = plot_revenue_distribution(allocation)
+    print("Plot 2 generated:", fig2)
+    fig3 = plot_guest_satisfaction_distribution(guest_satisfaction)
+    print("Plot 3 generated:", fig3)
+    fig4 = plot_guests_per_hotel(allocation)
+    print("Plot 4 generated:", fig4)
+
     return {
         'allocation': allocation,
-        'random_allocation_report': random_allocation_report,
+        'allocation_report': random_allocation_report,
         'statistics': statistics,
-    }    
+        'plots': [fig1, fig2, fig3, fig4]
+}
+
+
 
 # Store the random_allocation function
 random_allocation_result = random_allocation(guests_dict_original, hotels_dict_original)
@@ -124,7 +144,7 @@ random_allocation_result = random_allocation(guests_dict_original, hotels_dict_o
 # Needed to pass the report to the main file
 def print_random_allocation_report(random_allocation_result):
     # Assuming the result has a 'price_allocation_report' key that contains the report
-    allocation_report = random_allocation_result.get('random_allocation_report', None)
+    allocation_report = random_allocation_result.get('allocation_report', None)
     
     # Generate a string report
     report = f"Allocation Report:\n{allocation_report}"

@@ -121,10 +121,10 @@ def price_allocation(guests_dict_original, hotels_dict_original):
     
     # return the results for allocation, guests and hotels.
     return{
-       # 'allocation': allocation,
-       # 'unassigned_guests': unassigned_guests,
-       # 'unassigned_count': unassigned_count,
-        'price_allocation_report': price_allocation_report,
+        'allocation': allocation,
+        'unassigned_guests': unassigned_guests,
+        'unassigned_count': unassigned_count,
+        'allocation_report': price_allocation_report,
         'statistics': statistics,
     }    
     
@@ -133,7 +133,7 @@ price_allocation_result = price_allocation(guests_dict_original, hotels_dict_ori
 
 ## Needed to pass the report to the main file
 def printed_price_allocation_report(price_allocation_result):
-    allocation_report = price_allocation_result.get('price_allocation_report', None)
+    allocation_report = price_allocation_result.get('allocation_report', None)
     
     # Generate a string report
     report = f"Allocation Report:\n{allocation_report}"

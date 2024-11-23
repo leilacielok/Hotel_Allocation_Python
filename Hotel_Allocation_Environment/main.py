@@ -1,6 +1,4 @@
 import streamlit as st
-import numpy as np
-import pandas as pd
 from copy import deepcopy
 import matplotlib.pyplot as plt
 import time
@@ -13,7 +11,7 @@ from src.Allocation_Methods.Price_Allocation import price_allocation, printed_pr
 from src.Allocation_Methods.Random_Allocation import random_allocation, print_random_allocation_report
 from src.Allocation_Methods.Availability_Allocation import availability_allocation, printed_availability_allocation_report
 from src.Allocation_Methods.Reservation_Allocation import reservation_allocation, printed_reservation_allocation_report
-from src.Visualization import plot_execution_times, time_comparison, statistics_comparison
+from src.Visualization import plot_execution_times, statistics_comparison
 
 # Hotel Manager class
 class HotelManager:
@@ -81,26 +79,22 @@ class HotelManager:
         report = report_function(result)
         return {
                 'allocation_report': report,
-                'statistics': result['statistics']
+                'statistics': result['statistics'],
+                'plots': result.get('plots', []) # empty list if no plots exist
         }
 
     def run_all_methods(self):
-        print("\nRunning Random Allocation...")
-        self.reset_hotels()
-        print(self.run_allocations("Random", random_allocation, print_random_allocation_report))
-        
-        print("Running Reservation Allocation...")
-        self.reset_hotels()
-        print(self.run_allocations("Reservation", reservation_allocation, printed_reservation_allocation_report))
+        methods = {
+            "Random": (random_allocation, print_random_allocation_report),
+            "Reservation": (reservation_allocation, printed_reservation_allocation_report),
+            "Price": (price_allocation, printed_price_allocation_report),
+            "Availability": (availability_allocation, printed_availability_allocation_report)
+        }
 
-        print("\nRunning Price Allocation...")
-        self.reset_hotels()
-        print(self.run_allocations("Price", price_allocation, printed_price_allocation_report))
-        
-        print("\nRunning Availability Allocation...")
-        self.reset_hotels()
-        print(self.run_allocations("Availability", availability_allocation, printed_availability_allocation_report))
-
+        for method_name, (method, report_function) in methods.items():
+            print(f"\nRunning {method_name} Allocation...")
+            self.reset_hotels()
+            print(self.run_allocations(method_name, method, report_function))
 
     
 # Main program: Streamlit App
@@ -119,40 +113,69 @@ if __name__ == "__main__":
             st.write("All methods executed. Check the visualizations below.")
             st.write("Execution Times:", manager.times)
             st.write("Statistics:", manager.statistics)
+        
+            # Iterate over the stored results from the run_all_methods.
+            for name, result in manager.results.items():  
+                st.subheader(f"{name} Allocation Report")
+                
+                allocation_report = result.get('allocation_report', None)
+                if allocation_report:
+                    st.text_area(f"{name} Allocation Report", str(result['allocation_report']), height=300)
+                else: 
+                    st.write(f"No allocation report available for {name}.")
+
+                st.subheader(f"{name} Statistics")
+                st.write(f"Assigned Guests Count: {result['statistics']['assigned_guests_count']}")
+                st.write(f"Average Satisfaction Score: {result['statistics']['average_satisfaction_score']}")
+                st.write(f"Occupied Hotels Count: {result['statistics']['occupied_hotels_count']}")
+                st.write(f"Average Revenue: {result['statistics']['average_revenue']}")
+                
+                # Display the visualizations
+                st.subheader(f"{name} Allocation Visualizations")
+                if result.get('plots', []):
+                    for fig in result['plots']:
+                        st.pyplot(fig)
+                else:
+                    st.write(f"No visualizations available for {name}.")
+                            
+            # Display execution time and statistics plots
+            st.subheader("Execution Times Across Allocation Methods")
+            st.pyplot(plot_execution_times(manager.times))
+            
+            st.subheader("Statistics Comparison Across Allocation Methods")
+            st.pyplot(statistics_comparison(list(manager.statistics.values())))
+            
         else:
             # Map method to function
             method_mapping = {
-                "Random": ("Random", random_allocation, print_random_allocation_report),
-                "Reservation": ("Reservation", reservation_allocation, printed_reservation_allocation_report),
-                "Price": ("Price", price_allocation, printed_price_allocation_report),
-                "Availability": ("Availability", availability_allocation, printed_availability_allocation_report)
+                "Random": manager.run_random_allocation,
+                "Reservation": manager.run_reservation_allocation,
+                "Price": manager.run_price_allocation,
+                "Availability": manager.run_availability_allocation
             }
-            name, method, report_function = method_mapping[allocation_method]
-            st.write("Resetting hotel data...")
-            manager.reset_hotels()
-            st.write(f"Running {name} allocation...")
-
-            report = manager.run_allocations(name, method, report_function)
-            
-            # Display allocation report    
-            st.text_area(f"{name} Allocation Report", report, height = 300)
-            # Display statistics
-            st.subheader(f"{name} Statistics")
-            st.write(f"Assigned Guests Count: {report['statistics']['assigned_guests_count']}")
-            st.write(f"Average Satisfaction Score: {report['statistics']['average_satisfaction_score']}")
-            st.write(f"Occupied Hotels Count: {report['statistics']['occupied_hotels_count']}")
-            st.write(f"Average Revenue: {report['statistics']['average_revenue']}")               
-            
-    # Visualization
-    if st.sidebar.checkbox("Show Visualizations"):
-        # Check that execution times are available before plotting
-        if manager.times:
-            st.subheader("Execution Times Across Allocation Methods")
-            fig1 = plot_execution_times(manager.times)
-            st.pyplot(fig1)
-        # Check that statistics are available before plotting
-        if manager.statistics:
-            st.subheader("Statistics Comparison Across Allocation Methods")
-            fig2 = statistics_comparison(list(manager.statistics.values()))
-            st.pyplot(fig2)
-    
+            if allocation_method in method_mapping:
+                result = method_mapping[allocation_method]()
+                st.subheader(f"{allocation_method} Allocation Report")
+                
+                allocation_report = result.get('allocation_report', None)
+                if allocation_report:
+                    st.text_area(f"{allocation_method} Allocation Report", str(result['allocation_report']), height=300)
+                else:
+                    st.write("No visualizations available for this method.")
+                
+                st.subheader(f"{allocation_method} Statistics")
+                st.write(f"Assigned Guests Count: {result['statistics']['assigned_guests_count']}")
+                st.write(f"Average Satisfaction Score: {result['statistics']['average_satisfaction_score']}")
+                st.write(f"Occupied Hotels Count: {result['statistics']['occupied_hotels_count']}")
+                st.write(f"Average Revenue: {result['statistics']['average_revenue']}")
+                
+                st.subheader(f"{allocation_method} Allocation Visualizations")
+                plots = result.get('plots', [])
+                if plots:
+                    for fig in plots:
+                        st.pyplot(fig)
+                else:
+                    st.write("No visualizations available for this method.")
+                    st.write(f"Plots: {plots}") # Debug
+                    
+        

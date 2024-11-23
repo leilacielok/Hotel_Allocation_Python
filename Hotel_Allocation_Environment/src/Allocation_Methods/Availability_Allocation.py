@@ -113,7 +113,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
         'unassigned_count': unassigned_count,
-        'availability_allocation_report': availability_allocation_report,
+        'allocation_report': availability_allocation_report,
         'statistics': statistics,
     }
     
@@ -123,7 +123,7 @@ availability_allocation_result = availability_allocation(guests_dict_original, h
 
 # Needed to pass the report to the main file
 def printed_availability_allocation_report(availability_allocation_result):
-    allocation_report = availability_allocation_result.get('availability_allocation_report', None)
+    allocation_report = availability_allocation_result.get('allocation_report', None)
     
     # Generate a string report
     report = f"Allocation Report:\n{allocation_report}"
