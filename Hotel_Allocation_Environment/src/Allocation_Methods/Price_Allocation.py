@@ -1,6 +1,11 @@
 import pandas as pd
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
+from src.Data_Visualization.random_visualization import (
+    plot_revenue_distribution,
+    plot_guest_satisfaction_distribution,
+    plot_guests_per_hotel,
+)
 
 """
 Concept:
@@ -96,7 +101,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
             'rooms_occupied': occupied_rooms,
             'rooms_available': data['available_rooms'],
             'number_of_guests_accommodated': len(guests),
-            'final_revenue': round(final_revenue, 2),
+            'revenue': round(final_revenue, 2),
             'guests': guests
         } 
     
@@ -104,7 +109,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
 
     # Now I have all the details I need to compute total and average revenue
     # Total and overall average revenue
-    total_revenues = sum(details['final_revenue'] for details in price_allocation_report.values())
+    total_revenues = sum(details['revenue'] for details in price_allocation_report.values())
     occupied_hotels_count = sum(1 for details in price_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0 # don't divide by 0
     
@@ -119,6 +124,11 @@ def price_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
+    # Generate visualizations
+    fig1 = plot_revenue_distribution(price_allocation_report)
+    fig2 = plot_guest_satisfaction_distribution(guest_satisfaction)
+    fig3 = plot_guests_per_hotel(price_allocation_report)
+    
     # return the results for allocation, guests and hotels.
     return{
         'allocation': allocation,
@@ -126,6 +136,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
         'unassigned_count': unassigned_count,
         'allocation_report': price_allocation_report,
         'statistics': statistics,
+        'plots': [fig1, fig2, fig3]
     }    
     
 price_allocation_result = price_allocation(guests_dict_original, hotels_dict_original)
@@ -133,10 +144,8 @@ price_allocation_result = price_allocation(guests_dict_original, hotels_dict_ori
 
 ## Needed to pass the report to the main file
 def printed_price_allocation_report(price_allocation_result):
+    # Directly return the allocation_report dictionary instead of creating a string
     allocation_report = price_allocation_result.get('allocation_report', None)
-    
-    # Generate a string report
-    report = f"Allocation Report:\n{allocation_report}"
-    
-    return report
+    return allocation_report  # Just return the allocation report (as a dictionary)
+
 

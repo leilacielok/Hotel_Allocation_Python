@@ -1,6 +1,11 @@
 import pandas as pd
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
+from src.Data_Visualization.random_visualization import (
+    plot_revenue_distribution,
+    plot_guest_satisfaction_distribution,
+    plot_guests_per_hotel,
+)
 
 def availability_allocation(guests_dict_original, hotels_dict_original):
     """
@@ -88,12 +93,12 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
             'rooms_occupied': occupied_rooms,
             'rooms_available': data['available_rooms'],
             'number_of_guests_accommodated': len(guests),
-            'final_revenue': round(final_revenue, 2),
+            'revenue': round(final_revenue, 2),
             'guests': guests
         }
     
     # Total and average revenue of the allocation method
-    total_revenues = sum(details['final_revenue'] for details in availability_allocation_report.values())
+    total_revenues = sum(details['revenue'] for details in availability_allocation_report.values())
     occupied_hotels_count = sum(1 for details in availability_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0  # Avoid division by zero
     
@@ -108,6 +113,11 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
+    # Generate visualizations
+    fig1 = plot_revenue_distribution(availability_allocation_report)
+    fig2 = plot_guest_satisfaction_distribution(guest_satisfaction)
+    fig3 = plot_guests_per_hotel(availability_allocation_report)
+    
     # Return results for allocation, guests, and hotels
     return {
         'allocation': allocation,
@@ -115,6 +125,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'unassigned_count': unassigned_count,
         'allocation_report': availability_allocation_report,
         'statistics': statistics,
+        'plots': [fig1, fig2, fig3]
     }
     
 # Store the function
@@ -123,10 +134,10 @@ availability_allocation_result = availability_allocation(guests_dict_original, h
 
 # Needed to pass the report to the main file
 def printed_availability_allocation_report(availability_allocation_result):
+    # Get the allocation report directly from the result
     allocation_report = availability_allocation_result.get('allocation_report', None)
     
-    # Generate a string report
-    report = f"Allocation Report:\n{allocation_report}"
-    
-    return report
+    # Instead of converting it to a string, just return the dictionary
+    return allocation_report  # Return the allocation report as a dictionary, not a string
+
 

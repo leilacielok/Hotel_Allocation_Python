@@ -1,23 +1,11 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+from collections import Counter
 
 # Random function visualization: Create a new figure for each plot to avoid reusing the same figure
-def plot_occupancy_distribution(allocation):
-    fig, ax = plt.subplots()
-    hotel_ids = list(allocation.keys())
-    num_guests = [allocation[hotel_id]['number_of_guests_accommodated'] for hotel_id in hotel_ids]
-    
-    ax.bar(hotel_ids, num_guests)
-    ax.set_xlabel('Hotel')
-    ax.set_ylabel('Number of Guests')
-    ax.set_title('Occupancy Distribution')
-    # Remove x-tick labels (make them empty)
-    ax.set_xticklabels([])  # Empty list removes the label
-    return fig
-
-def plot_revenue_distribution(allocation):
-    hotel_names = list(allocation.keys())
-    revenues = [allocation[hotel_name]['revenue'] for hotel_name in hotel_names]
+def plot_revenue_distribution(allocation_report):
+    hotel_names = list(allocation_report.keys())
+    revenues = [allocation_report[hotel_name]['revenue'] for hotel_name in hotel_names]
     
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.histplot(revenues, bins=30, kde=True, color='green', edgecolor='black', ax=ax)
@@ -36,13 +24,25 @@ def plot_guest_satisfaction_distribution(guest_satisfaction):
     ax.set_ylabel('Number of Guests')
     return fig
 
-def plot_guests_per_hotel(allocation):
-    hotel_names = list(allocation.keys())
-    num_guests = [allocation[hotel_name]['number_of_guests_accommodated'] for hotel_name in hotel_names]
+def plot_guests_per_hotel(allocation_report):
+    # Get the number of guests per hotel
+    hotel_guest_counts = [
+        allocation_report[hotel_name]['number_of_guests_accommodated'] 
+        for hotel_name in allocation_report
+    ]
+    
+    # Count how many hotels have 1 guest, 2 guests, 3 guests, etc.
+    guest_count_distribution = Counter(hotel_guest_counts)
+    # Sort by the number of guests (x-axis values)
+    sorted_guest_counts = sorted(guest_count_distribution.items())
+    
+    num_guests, num_hotels = zip(*sorted_guest_counts)
     
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=hotel_names, y=num_guests, color='purple', ax=ax)
-    ax.set_title('Number of Guests per Hotel')
-    ax.set_xlabel('Hotels')
-    ax.set_ylabel('Number of Guests')
+    ax.bar(num_guests, num_hotels, color='purple')
+    
+    ax.set_xlabel('Number of Guests per Hotel')
+    ax.set_ylabel('Number of Hotels')
+    ax.set_title('Guests Distribution over Hotels')
+    
     return fig

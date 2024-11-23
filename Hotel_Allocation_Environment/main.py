@@ -2,6 +2,7 @@ import streamlit as st
 from copy import deepcopy
 import matplotlib.pyplot as plt
 import time
+import pandas as pd
 plt.switch_backend('Agg')
 
 # External functions
@@ -29,9 +30,11 @@ class HotelManager:
         result = random_allocation(self.guests_dict, self.hotels_dict)
         self.statistics['Random'] = result['statistics']  
         self.results['Random'] = result
-        random_allocation_report = print_random_allocation_report(result)
+        # Process the allocation report into a DataFrame
+        random_allocation_report_df = self.create_allocation_report_df(result.get('allocation_report', {}))
+        
         return {
-            'allocation_report': random_allocation_report,
+            'allocation_report': random_allocation_report_df,
             'statistics': result['statistics'],
             'plots': result.get('plots', [])
         }
@@ -40,34 +43,54 @@ class HotelManager:
         result = reservation_allocation(self.guests_dict, self.hotels_dict)
         self.statistics['Reservation'] = result['statistics']  
         self.results['Reservation'] = result    
-        reservation_allocation_report = printed_reservation_allocation_report(result)
+        reservation_allocation_report_df = self.create_allocation_report_df(result.get('allocation_report', {}))
         return {
-            'allocation_report': reservation_allocation_report,
-            'statistics': result['statistics']
+            'allocation_report': reservation_allocation_report_df,
+            'statistics': result['statistics'],
+            'plots': result.get('plots', [])
         }
     
     def run_price_allocation(self):
         result = price_allocation(self.guests_dict, self.hotels_dict)
         self.statistics['Price'] = result['statistics'] 
         self.results['Price'] = result
-        price_allocation_report = printed_price_allocation_report(result)
+        price_allocation_report_df = self.create_allocation_report_df(result.get('allocation_report', {}))
         return {
-            'allocation_report': price_allocation_report,
-            'statistics': result['statistics']
+            'allocation_report': price_allocation_report_df,
+            'statistics': result['statistics'],
+            'plots': result.get('plots', [])
         }
     
     def run_availability_allocation(self):
         result = availability_allocation(self.guests_dict, self.hotels_dict)
         self.statistics['Availability'] = result['statistics'] 
         self.results['Availability'] = result
-        availability_allocation_report = printed_availability_allocation_report(result)
+        availability_allocation_report_df = self.create_allocation_report_df(result.get('allocation_report', {}))
         return {
-            'allocation_report': availability_allocation_report,
-            'statistics': result['statistics']
+            'allocation_report': availability_allocation_report_df,
+            'statistics': result['statistics'],
+            'plots': result.get('plots', [])
         }
     
-    
-      # Unified method to run all allocations (needed for data visualization)
+    def create_allocation_report_df(self, allocation_report):
+        """
+        This helper method processes the allocation report and returns a DataFrame
+        with the necessary hotel data (rooms, revenue, guests, etc.)
+        """
+        rows = []
+        for hotel, data in allocation_report.items():
+            row = {
+                'Hotel': hotel,
+                'Rooms Occupied': data.get('rooms_occupied', 0),
+                'Rooms Available': data.get('rooms_available', 0),
+                'Number of Guests Accommodated': data.get('number_of_guests_accommodated', 0),
+                'Revenue ($)': f"${data.get('revenue', 0):,.2f}",
+                'Guests': ', '.join(data.get('guests', []))  # Join guest list into a single string
+            }
+            rows.append(row)
+        return pd.DataFrame(rows)
+            
+    # Unified method to run all allocations (needed for data visualization)
     def run_allocations(self, method_name, method, report_function):
         start_time = time.time()
         result = method(self.guests_dict, self.hotels_dict)
@@ -112,9 +135,16 @@ if __name__ == "__main__":
         if allocation_method == "Run All":
             manager.run_all_methods()
             st.write("All methods executed. Check the visualizations below.")
-            st.write("Execution Times:", manager.times)
-            st.write("Statistics:", manager.statistics)
-        
+
+            # Display the statistics in a table format: create a DataFrame for statistics
+            statistics_df = pd.DataFrame.from_dict(manager.statistics, orient='index')
+            times_series = pd.Series(manager.times, name="execution_time")
+            statistics_df["execution_time"] = times_series
+            
+            # Display the statistics as a table
+            st.subheader("Statistics Summary")
+            st.table(statistics_df)
+
             # Display execution time and statistics plots
             st.subheader("Execution Times Across Allocation Methods")
             st.pyplot(plot_execution_times(manager.times))
@@ -135,10 +165,8 @@ if __name__ == "__main__":
                 st.subheader(f"{allocation_method} Allocation Report")
                 
                 allocation_report = result.get('allocation_report', None)
-                if allocation_report:
-                    st.text_area(f"{allocation_method} Allocation Report", str(allocation_report), height=300)
-                else:
-                    st.write("No visualizations available for this method.")
+                
+                st.dataframe(allocation_report)  # Directly display the DataFrame
                 
                 st.subheader(f"{allocation_method} Statistics")
                 st.write(f"Assigned Guests Count: {result['statistics']['assigned_guests_count']}")

@@ -1,6 +1,11 @@
 import numpy as np
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
+from src.Data_Visualization.random_visualization import (
+    plot_revenue_distribution,
+    plot_guest_satisfaction_distribution,
+    plot_guests_per_hotel,
+)
 
 def reservation_allocation(guests_dict_original, hotels_dict_original):
     """
@@ -84,7 +89,7 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
             'rooms_occupied': hotel_status[hotel_id]['rooms_occupied'],
             'rooms_available': data['available_rooms'],
             'number_of_guests_accommodated': len(guests),
-            'final_revenue': round(final_revenue, 2),
+            'revenue': round(final_revenue, 2),
             'guests': guests
         } 
     
@@ -92,7 +97,7 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
     total_assigned_guests = len(allocation)  
     
     # Total and overall average revenue
-    total_revenues = sum(details['final_revenue'] for details in reservation_allocation_report.values())
+    total_revenues = sum(details['revenue'] for details in reservation_allocation_report.values())
     occupied_hotels_count = sum(1 for details in reservation_allocation_report.values() if details['number_of_guests_accommodated'] > 0)
     average_revenue = round(total_revenues / occupied_hotels_count, 2) if occupied_hotels_count > 0 else 0 # don't divide by 0
     
@@ -106,6 +111,11 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
+    # Generate visualizations
+    fig1 = plot_revenue_distribution(reservation_allocation_report)
+    fig2 = plot_guest_satisfaction_distribution(customer_satisfaction)
+    fig3 = plot_guests_per_hotel(reservation_allocation_report)
+
     return{
         'allocation': allocation,
         'unassigned_guests': unassigned_guests,
@@ -113,6 +123,7 @@ def reservation_allocation(guests_dict_original, hotels_dict_original):
         'assigned_guests_count': total_assigned_guests,
         'allocation_report': reservation_allocation_report,
         'statistics': statistics,
+        'plots': [fig1, fig2, fig3]
     } 
 
 # Store the function
@@ -121,10 +132,9 @@ reservation_allocation_result = reservation_allocation(guests_dict_original, hot
 
 # Needed to pass the report to the main file
 def printed_reservation_allocation_report(reservation_allocation_result):
+    # Get the allocation report (assuming it's a dictionary)
     allocation_report = reservation_allocation_result.get('allocation_report', None)
-   
-    # Generate a string report or any formatted output here
-    report = f"Allocation Report:\n{allocation_report}"
     
-    return report
+    # Return the allocation report directly (no need for string formatting)
+    return allocation_report
 
