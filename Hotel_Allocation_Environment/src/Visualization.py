@@ -48,15 +48,15 @@ def time_comparison(results_dict, hotels_dict):
 ## Compare statistics across the allocation methods: the parameter is the list of the statistics dictionaries of the 4 methods
 # Keys are the guests count, the avg satisfaction, the hotels count, the avg revenue.
 def statistics_comparison(statistics_dicts):
-    allocation_methods = ['Price', 'Reservation', 'Random', 'Availability']  
+    allocation_methods = ['Random', 'Reservation', 'Price', 'Availability']  
     x = np.arange(len(allocation_methods))  # x axis labels (allocation methods)
     width = 0.5  # width of the bars for each statistic
-
-    # Extract values for each statistic across all allocation methods
-    assigned_guests_counts = [stats['assigned_guests_count'] for stats in statistics_dicts]
-    avg_satisfaction_scores = [stats['average_satisfaction_score'] for stats in statistics_dicts]
-    occupied_hotels_counts = [stats['occupied_hotels_count'] for stats in statistics_dicts]
-    avg_revenues = [stats['average_revenue'] for stats in statistics_dicts]
+    
+    # Extract values for each statistic dynamically from the list of dictionaries
+    assigned_guests_counts = [statistics_dict['assigned_guests_count'] for statistics_dict in statistics_dicts]
+    avg_satisfaction_scores = [statistics_dict['average_satisfaction_score'] for statistics_dict in statistics_dicts]
+    occupied_hotels_counts = [statistics_dict['occupied_hotels_count'] for statistics_dict in statistics_dicts]
+    avg_revenues = [statistics_dict['average_revenue'] for statistics_dict in statistics_dicts]
         
     # Create subplots: 4 separate plots, one for each statistic
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # 2 rows, 2 columns for 4 plots

@@ -32,7 +32,8 @@ class HotelManager:
         random_allocation_report = print_random_allocation_report(result)
         return {
             'allocation_report': random_allocation_report,
-            'statistics': result['statistics']
+            'statistics': result['statistics'],
+            'plots': result.get('plots', [])
         }
 
     def run_reservation_allocation(self):
@@ -114,30 +115,6 @@ if __name__ == "__main__":
             st.write("Execution Times:", manager.times)
             st.write("Statistics:", manager.statistics)
         
-            # Iterate over the stored results from the run_all_methods.
-            for name, result in manager.results.items():  
-                st.subheader(f"{name} Allocation Report")
-                
-                allocation_report = result.get('allocation_report', None)
-                if allocation_report:
-                    st.text_area(f"{name} Allocation Report", str(result['allocation_report']), height=300)
-                else: 
-                    st.write(f"No allocation report available for {name}.")
-
-                st.subheader(f"{name} Statistics")
-                st.write(f"Assigned Guests Count: {result['statistics']['assigned_guests_count']}")
-                st.write(f"Average Satisfaction Score: {result['statistics']['average_satisfaction_score']}")
-                st.write(f"Occupied Hotels Count: {result['statistics']['occupied_hotels_count']}")
-                st.write(f"Average Revenue: {result['statistics']['average_revenue']}")
-                
-                # Display the visualizations
-                st.subheader(f"{name} Allocation Visualizations")
-                if result.get('plots', []):
-                    for fig in result['plots']:
-                        st.pyplot(fig)
-                else:
-                    st.write(f"No visualizations available for {name}.")
-                            
             # Display execution time and statistics plots
             st.subheader("Execution Times Across Allocation Methods")
             st.pyplot(plot_execution_times(manager.times))
@@ -159,7 +136,7 @@ if __name__ == "__main__":
                 
                 allocation_report = result.get('allocation_report', None)
                 if allocation_report:
-                    st.text_area(f"{allocation_method} Allocation Report", str(result['allocation_report']), height=300)
+                    st.text_area(f"{allocation_method} Allocation Report", str(allocation_report), height=300)
                 else:
                     st.write("No visualizations available for this method.")
                 
@@ -176,6 +153,5 @@ if __name__ == "__main__":
                         st.pyplot(fig)
                 else:
                     st.write("No visualizations available for this method.")
-                    st.write(f"Plots: {plots}") # Debug
                     
         
