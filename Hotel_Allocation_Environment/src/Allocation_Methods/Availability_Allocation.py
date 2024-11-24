@@ -1,7 +1,7 @@
 import pandas as pd
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
 from src.Guests_Hotels_Dictionaries.Hotels import hotels_dict_original
-from src.Data_Visualization.random_visualization import (
+from src.Data_Visualization.individual_visualization import (
     plot_revenue_distribution,
     plot_guest_satisfaction_distribution,
     plot_guests_per_hotel,
