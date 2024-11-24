@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit as st
 import pandas as pd
 from collections import Counter
 
@@ -94,3 +95,57 @@ def plot_revenue_by_room_category(df):
     ax.set_ylabel('Revenue', fontsize=12)
     
     return fig
+
+# Price plot: guests accommodated in hotels grouped by price categories
+# Group hotels by price
+def group_hotels_by_price(price_allocation_report, hotels_dict):
+    # Prepare data for grouping by price
+    hotel_prices = []
+    num_guests = []
+    hotel_labels = []
+
+    for hotel_id, report in price_allocation_report.items():
+        hotel_prices.append(hotels_dict[hotel_id]['price'])  
+        num_guests.append(report.get('number_of_guests_accommodated', 0))
+        hotel_labels.append(hotel_id)
+
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'Hotel': hotel_labels,
+        'Price': hotel_prices,
+        'Number of Guests': num_guests
+    })
+
+    # Define price categories
+    bins = [0, 60, 130, 200, float('inf')]  # Adjust ranges as necessary
+    labels = ['Budget', 'Mid-range', 'Luxury', 'Ultra Luxury']
+    df['Price Category'] = pd.cut(df['Price'], bins=bins, labels=labels)
+
+    return df
+
+"""
+    Creates a box plot of the number of guests grouped by price category.
+    Parameters:
+        df (pd.DataFrame): DataFrame containing 'Price Category' and 'Number of Guests'.
+    Returns:
+        matplotlib.figure.Figure: A Matplotlib figure object for Streamlit compatibility.
+    """
+
+def plot_guests_by_price_category(df, show_dataframe=False):
+   # Only display the dataframe if the flag is True
+    if show_dataframe:
+        st.subheader("DataFrame: Guests allocation to different luxury-level hotels")
+        st.write(df)
+    # Create boxplot below the dataframe
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Create the box plot grouped by price category
+    sns.boxplot(x='Price Category', y='Number of Guests', data=df, palette="Set2", ax=ax)
+
+    # Add titles and labels
+    ax.set_title('Number of Guests Accommodated by Price Category', fontsize=16)
+    ax.set_xlabel('Price Category', fontsize=12)
+    ax.set_ylabel('Number of Guests', fontsize=12)
+    
+    return fig
+

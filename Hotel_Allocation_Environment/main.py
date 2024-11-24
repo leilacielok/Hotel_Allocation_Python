@@ -82,6 +82,7 @@ if __name__ == "__main__":
                 st.write(f"Occupied Hotels Count: {result['statistics']['occupied_hotels_count']}")
                 st.write(f"Average Revenue: {result['statistics']['average_revenue']}")
                 
+                # Visualizations
                 st.subheader(f"{allocation_method} Allocation Visualizations")
                 plots = result.get('plots', [])
                 if plots:

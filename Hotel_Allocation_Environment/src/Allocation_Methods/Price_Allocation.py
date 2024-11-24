@@ -5,6 +5,8 @@ from src.Data_Visualization.individual_visualization import (
     plot_revenue_distribution,
     plot_guest_satisfaction_distribution,
     plot_guests_per_hotel,
+    group_hotels_by_price,
+    plot_guests_by_price_category
 )
 
 """
@@ -124,11 +126,14 @@ def price_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
+    df_grouped = group_hotels_by_price(price_allocation_report, hotels_dict_original)
+
     # Generate visualizations
     fig1 = plot_revenue_distribution(price_allocation_report)
     fig2 = plot_guest_satisfaction_distribution(guest_satisfaction)
     fig3 = plot_guests_per_hotel(price_allocation_report)
-    
+    fig4 = plot_guests_by_price_category(df_grouped)
+
     # return the results for allocation, guests and hotels.
     return{
         'allocation': allocation,
@@ -136,7 +141,7 @@ def price_allocation(guests_dict_original, hotels_dict_original):
         'unassigned_count': unassigned_count,
         'allocation_report': price_allocation_report,
         'statistics': statistics,
-        'plots': [fig1, fig2, fig3]
+        'plots': [fig1, fig2, fig3, fig4]
     }    
     
 price_allocation_result = price_allocation(guests_dict_original, hotels_dict_original)
