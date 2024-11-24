@@ -2,10 +2,11 @@ Hotel_Allocation_Environment/
 .vscode/
 __pycache__/
 Scripts/
+Data_storing/
 Lib/
 Include/
-etc/jupyter/nbconfig/notebook.dData_storing/
-share/jupyter/nbextensions/pydeck/
+etc/
+share/
 *.egg-info/
 *.pyc
 *.pyo
