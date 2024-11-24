@@ -3,8 +3,9 @@ Hotel_Allocation_Environment/
 __pycache__/
 Scripts/
 Lib/
-Data_storing/
-share/man/man1/
+Include/
+etc/jupyter/nbconfig/notebook.dData_storing/
+share/jupyter/nbextensions/pydeck/
 *.egg-info/
 *.pyc
 *.pyo
