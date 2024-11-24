@@ -5,6 +5,8 @@ from src.Data_Visualization.individual_visualization import (
     plot_revenue_distribution,
     plot_guest_satisfaction_distribution,
     plot_guests_per_hotel,
+    group_hotels_by_rooms,
+    plot_revenue_by_room_category
 )
 
 def availability_allocation(guests_dict_original, hotels_dict_original):
@@ -113,10 +115,13 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
+    df_grouped = group_hotels_by_rooms(availability_allocation_report)
+
     # Generate visualizations
     fig1 = plot_revenue_distribution(availability_allocation_report)
     fig2 = plot_guest_satisfaction_distribution(guest_satisfaction)
     fig3 = plot_guests_per_hotel(availability_allocation_report)
+    fig4 = plot_revenue_by_room_category(df_grouped)
     
     # Return results for allocation, guests, and hotels
     return {
@@ -125,7 +130,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'unassigned_count': unassigned_count,
         'allocation_report': availability_allocation_report,
         'statistics': statistics,
-        'plots': [fig1, fig2, fig3]
+        'plots': [fig1, fig2, fig3, fig4]
     }
     
 # Store the function

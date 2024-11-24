@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 from collections import Counter
 
 # Histogram to visualize the distribution of revenues across hotels
@@ -46,5 +47,50 @@ def plot_guests_per_hotel(allocation_report):
     ax.set_xlabel('Number of Guests per Hotel')
     ax.set_ylabel('Number of Hotels')
     ax.set_title('Guests Distribution over Hotels')
+    
+    return fig
+
+# Availability plot: group by room availability and see if the revenue changes
+def group_hotels_by_rooms(availability_allocation_report):
+    # Prepare data for grouping by available rooms
+    available_rooms = []
+    revenues = []
+    hotel_labels = []
+
+    for hotel_id, report in availability_allocation_report.items():
+        available_rooms.append(report['rooms_available'])
+        revenues.append(report['revenue'])
+        hotel_labels.append(hotel_id)
+
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'Hotel': hotel_labels,
+        'Available Rooms': available_rooms,
+        'Revenue': revenues
+    })
+
+    # Define the room categories
+    bins = [0, 5, 10, float('inf')]  # Define the bins for low, medium, and high availability
+    labels = ['Low Availability', 'Medium Availability', 'High Availability']
+    df['Room Category'] = pd.cut(df['Available Rooms'], bins=bins, labels=labels)
+
+    return df
+
+# Create the box plot
+def plot_revenue_by_room_category(df):
+    # Check the grouped DataFrame structure
+    print("\nData for Plotting:")
+    print(df)
+
+    #  Create a figure and axis explicitly
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Create the box plot grouped by room category
+    sns.boxplot(x='Room Category', y='Revenue', data=df, palette="Set2", ax=ax)
+    
+    # Add titles and labels
+    ax.set_title('Revenue Distribution by Room Availability', fontsize=16)
+    ax.set_xlabel('Room Availability Category', fontsize=12)
+    ax.set_ylabel('Revenue', fontsize=12)
     
     return fig
