@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
+import seaborn as sns # just to enhance visualization
 import streamlit as st
 import pandas as pd
 from collections import Counter

@@ -35,7 +35,7 @@ Compare statistics across the allocation methods: the parameter is the list of t
 Keys are the guests count, the avg satisfaction, the hotels count, the avg revenue."""
 def statistics_comparison(statistics_dicts):
     allocation_methods = ['Random', 'Reservation', 'Price', 'Availability'] # Define the names of the methods
-    x = np.arange(len(allocation_methods))  # x axis: bars for each method
+    x = np.arange(len(allocation_methods))  # x axis: bars for each method. creates an array for creating evenly spaced tick labels for the allocation methods.
     width = 0.5  # width of the bars 
     
     # Extract the values for each statistic dynamically from the list of dictionaries

@@ -1,7 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
-plt.switch_backend('Agg')
+plt.switch_backend('Agg') # to make Matplotlib work in a non-interactive environment like Streamlit.
 
 # External objects and functions
 from src.Guests_Hotels_Dictionaries.Guests import guests_dict_original
