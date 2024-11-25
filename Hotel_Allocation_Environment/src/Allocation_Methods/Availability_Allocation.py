@@ -57,7 +57,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
 
                 allocated = True
                 break  # Stop and move to the next guest once allocated
-        
+   
         # If no hotel in preferences has available rooms, allocate based on availability order.
         # In this case, guests' satisfaction scores suffer a penalty for being allocated outside preferences.
         if not allocated:
@@ -115,7 +115,7 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
         'average_revenue': average_revenue
     }
     
-    df_grouped = group_hotels_by_rooms(availability_allocation_report)
+    df_grouped = group_hotels_by_rooms(availability_allocation_report, hotels_dict_original)
 
     # Generate visualizations
     fig1 = plot_revenue_distribution(availability_allocation_report)
@@ -135,7 +135,6 @@ def availability_allocation(guests_dict_original, hotels_dict_original):
     
 # Store the function
 availability_allocation_result = availability_allocation(guests_dict_original, hotels_dict_original)
-
 
 # Needed to pass the report to the main file
 def printed_availability_allocation_report(availability_allocation_result):

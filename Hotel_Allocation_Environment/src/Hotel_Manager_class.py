@@ -85,10 +85,13 @@ class HotelManager:
                 'Guests': ', '.join(data.get('guests', []))  # Join guest list into a single string
             }
             rows.append(row)
-        return pd.DataFrame(rows)
+        return pd.DataFrame(rows) # Standardize every report into a structured dataframe
             
-    # Unified method to run all allocations (needed for data visualization)
     def run_allocations(self, method_name, method, report_function):
+        """Helper method: it runs a singel function and stores the results in the HotelManager instance (self.results, self.times, self.statistics).
+        Parameters are the name of the allocation to execute, the allocation function and a function that formats the allocation results 
+        (such as print_random_allocation_report).
+        It is a generic function for all the individual methods."""
         start_time = time.time()
         result = method(self.guests_dict, self.hotels_dict)
         elapsed_time = time.time() - start_time
@@ -104,15 +107,17 @@ class HotelManager:
                 'plots': result.get('plots', []) # empty list if no plots exist
         }
 
-    def run_all_methods(self):
+    def run_all_methods(self): # no input (uses all four methods)
+        """runs all allocation methods in sequence and display their results (for each method). 
+        It relies on run_allocations to handle each method's execution."""
         methods = {
             "Random": (random_allocation, print_random_allocation_report),
             "Reservation": (reservation_allocation, printed_reservation_allocation_report),
             "Price": (price_allocation, printed_price_allocation_report),
             "Availability": (availability_allocation, printed_availability_allocation_report)
         }
-
-        for method_name, (method, report_function) in methods.items():
+        # calls run_allocation function for every method
+        for method_name, (method, report_function) in methods.items(): # iterates over the dictionary running each method with run_allocations
             print(f"\nRunning {method_name} Allocation...")
-            self.reset_hotels()
+            self.reset_hotels() # after each allocation resets hotels data to ensure independence
             print(self.run_allocations(method_name, method, report_function))

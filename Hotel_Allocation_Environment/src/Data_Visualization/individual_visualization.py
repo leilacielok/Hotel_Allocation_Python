@@ -52,26 +52,26 @@ def plot_guests_per_hotel(allocation_report):
     return fig
 
 # Availability plot: group by room availability and see if the revenue changes
-def group_hotels_by_rooms(availability_allocation_report):
+def group_hotels_by_rooms(availability_allocation_report, hotels_dict_original):
     # Prepare data for grouping by available rooms
     available_rooms = []
-    revenues = []
+    number_of_guests = []
     hotel_labels = []
 
     for hotel_id, report in availability_allocation_report.items():
-        available_rooms.append(report['rooms_available'])
-        revenues.append(report['revenue'])
+        available_rooms.append(hotels_dict_original[hotel_id]['available_rooms'])
+        number_of_guests.append(report['number_of_guests_accommodated'])
         hotel_labels.append(hotel_id)
 
     # Create a DataFrame
     df = pd.DataFrame({
         'Hotel': hotel_labels,
         'Available Rooms': available_rooms,
-        'Revenue': revenues
+        'Number of Guests': number_of_guests,
     })
 
     # Define the room categories
-    bins = [0, 5, 10, float('inf')]  # Define the bins for low, medium, and high availability
+    bins = [0, 6, 11, float('inf')]  # Define the bins for low, medium, and high availability
     labels = ['Low Availability', 'Medium Availability', 'High Availability']
     df['Room Category'] = pd.cut(df['Available Rooms'], bins=bins, labels=labels)
 
@@ -87,13 +87,14 @@ def plot_revenue_by_room_category(df):
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Create the box plot grouped by room category
-    sns.boxplot(x='Room Category', y='Revenue', data=df, palette="Set2", ax=ax)
+    sns.boxplot(x='Room Category', y='Number of Guests', data=df, palette="Set2", ax=ax)
     
     # Add titles and labels
-    ax.set_title('Revenue Distribution by Room Availability', fontsize=16)
+    ax.set_title('Guest Distribution by Room Availability', fontsize=16)
     ax.set_xlabel('Room Availability Category', fontsize=12)
-    ax.set_ylabel('Revenue', fontsize=12)
-    
+    ax.set_ylabel('Guests Number', fontsize=12)
+    # Improve layout
+    plt.tight_layout() 
     return fig
 
 # Price plot: guests accommodated in hotels grouped by price categories

@@ -139,3 +139,4 @@ def print_random_allocation_report(random_allocation_result):
     allocation_report = random_allocation_result.get('allocation_report', None)
     return allocation_report  # Just return the allocation report (as a dictionary)
 
+print_random_allocation_report(random_allocation_result)
